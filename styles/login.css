@@ -1,0 +1,73 @@
+body{
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    margin: 0;
+}
+
+#titleSection h1{
+    color: white;
+    position: absolute;
+    left: 25vw;
+    top: 10vw;
+    font-size: 3vw;
+}
+
+#titleSection img{
+    width: 100%;
+}
+
+
+#loginContainer{
+    display: grid;
+    grid-template-columns: auto 200px 200px 100px;
+    grid-gap: 10px;
+    margin: 8px;
+}
+
+#loginContainer input{
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+}
+
+.link{
+    text-decoration: none;
+    color: grey;
+}
+
+.content{
+    margin: 8px;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-gap: 10px;
+}
+
+.genButton {
+    border: black;
+    border-style: solid;
+    border-width: 1px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    background-color: white;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1.2em;
+  }
+
+.featureContainer{
+    margin: 40px;
+    padding: 20px;
+}
+
+.featureImage{
+    width: 50%;
+    height: auto;
+}
+
+footer{
+    float: right;
+}
+footer a{
+    margin: 10px;
+}
