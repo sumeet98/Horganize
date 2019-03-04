@@ -1,0 +1,42 @@
+.content{
+    margin: 8px;
+}
+
+#registerContainer{
+    display: table;
+    margin: 40px;
+    padding: 20px;
+}
+
+#registerContainer div{
+    display: table-row;
+    
+}
+
+#registerContainer label{
+    display: table-cell;
+    margin: 8px;
+}
+#registerContainer input{
+    display: table-cell;
+    margin: 8px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+}
+
+#registerContainer select{
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    display: table-cell;
+    margin: 8px;
+}
+#registerContainer span{
+    display: table-cell;
+}
+
+.invalid{
+    color: red;
+}
+
+
+

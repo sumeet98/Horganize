@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Horganize!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/main.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/register.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="scripts/register.js"></script>
+</head>
+
+<body>
+    <div id="titleSection">
+        <img src="images/background_cropped.png" alt="Login Background">
+        <a href="login.html">
+            <h1>Horganize!</h1>
+        </a>
+    </div>
+
+    <form id="loginForm">
+        <div id="loginContainer">
+            <div>
+                <br><br>
+                Keep housing easy and manage all your related stuff.
+            </div>
+            <div>
+                Email<br>
+                <input class="inputField" type="text" id="emailLogin"><br>
+                <a class="link" href="#">register</a>
+            </div>
+            <div>
+                Password<br>
+                <input class="inputField" type="text" name="pswLogin"><br>
+                <a class="link" href="#">forgot password?</a>
+            </div>
+            <div>
+                <button type="submit" class="genButton">Login</button>
+            </div>
+
+        </div>
+
+    </form>
+
+    <hr class="straightLine">
+
+    <div class="content">
+        <form id="registerForm" action="#" method="post" onsubmit="return validateForm()">
+            <div id="registerContainer">
+                <h2>Register</h2>
+                <div>
+                    <Label>Email*</Label>
+                    <input class="inputField required" type="email" id="emailRegister">
+                </div>
+                <div>
+                    <label>Password*</label>
+                    <input class="inputField required" type="password" id="pswRegister">
+                </div>
+                <div>
+                    <label>Repeat Password*</label>
+                    <input class="inputField required" type="password" id="pswRepeatRegister">
+                </div>
+                <div>
+                    <label>First Name*</label>
+                    <input class="inputField required" type="text" id="nameFirstRegister">
+                </div>
+                <div>
+                    <label>Last Name*</label>
+                    <input class="inputField required" type="text" id="nameLastRegister">
+                </div>
+                <div>
+                    <label>Adress</label>
+                    <input class="inputField" type="text" id="adressRegister">
+                </div>
+                <div>
+                    <label>School*</label>
+                    <select class="dropDown" id="dropDownRegister">
+                        <option value="uoit">UOIT</option>
+                        <option value="dc">Durham College</option>
+                        <option value="trent">Trent University</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit" id="registerSubmit" class="genButton">Submit</button>
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+    <footer>
+        <a class="link" href="#">contact</a>
+        <a class="link" href="#">about</a>
+    </footer>
+
+</body>
+
+</html>
