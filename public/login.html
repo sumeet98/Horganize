@@ -21,7 +21,7 @@
         </a>
     </div>
 
-    <form id="loginForm">
+    <form id="loginForm" method="post" action="/login">
         <div id="loginContainer">
             <div>
                 <br><br>
@@ -29,12 +29,12 @@
             </div>
             <div>
                 Email<br>
-                <input class="inputField" type="text" id="emailLogin"><br>
+                <input class="inputField" type="text" id="emailLogin" name="emailLogin"><br>
                 <a class="link" href="register.html">register</a>
             </div>
             <div>
                 Password<br>
-                <input class="inputField" type="text" name="pswLogin"><br>
+                <input class="inputField" type="password" name="pswLogin"><br>
                 <a class="link" href="#">forgot password?</a>
             </div>
             <div>

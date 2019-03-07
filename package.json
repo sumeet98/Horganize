@@ -1,0 +1,26 @@
+{
+  "name": "horganize",
+  "version": "1.0.0",
+  "description": "CSCI3230U Group Project Winter 2019",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sumeet98/Horganize.git"
+  },
+  "author": "Sumeet Dhillon, Timo Buechert",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sumeet98/Horganize/issues"
+  },
+  "homepage": "https://github.com/sumeet98/Horganize#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "path": "^0.12.7",
+    "uuid": "^3.3.2"
+  }
+}

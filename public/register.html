@@ -49,16 +49,16 @@
     <hr class="straightLine">
 
     <div class="content">
-        <form id="registerForm" action="#" method="post" onsubmit="return validateForm()">
+        <form id="registerForm" action="/register" method="post" onsubmit="return validateForm()">
             <div id="registerContainer">
                 <h2>Register</h2>
                 <div>
                     <Label>Email*</Label>
-                    <input class="inputField required" type="email" id="emailRegister">
+                    <input class="inputField required" type="email" id="emailRegister" name="emailRegister">
                 </div>
                 <div>
                     <label>Password*</label>
-                    <input class="inputField required" type="password" id="pswRegister">
+                    <input class="inputField required" type="password" id="pswRegister" name="pswRegister">
                 </div>
                 <div>
                     <label>Repeat Password*</label>
@@ -66,23 +66,28 @@
                 </div>
                 <div>
                     <label>First Name*</label>
-                    <input class="inputField required" type="text" id="nameFirstRegister">
+                    <input class="inputField required" type="text" id="nameFirstRegister" name="nameFirstRegister">
                 </div>
                 <div>
                     <label>Last Name*</label>
-                    <input class="inputField required" type="text" id="nameLastRegister">
+                    <input class="inputField required" type="text" id="nameLastRegister" name="nameLastRegister">
                 </div>
                 <div>
                     <label>Adress</label>
-                    <input class="inputField" type="text" id="adressRegister">
+                    <input class="inputField" type="text" id="adressRegister" name="adressRegister">
                 </div>
                 <div>
                     <label>School*</label>
-                    <select class="dropDown" id="dropDownRegister">
+                    <select class="dropDown" id="dropDownRegister" name="schoolRegister">
                         <option value="uoit">UOIT</option>
                         <option value="dc">Durham College</option>
                         <option value="trent">Trent University</option>
                     </select>
+                </div>
+
+                <div>
+                    <label id="humanProve"></label>
+                    <input class="inputField required" type="text" id="proveRegister">
                 </div>
 
                 <div>

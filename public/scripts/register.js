@@ -1,5 +1,6 @@
 var mailValid = false;
 var pswValid = false;
+var proveValid = false;
 
 $(document).ready(function () {
     var emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -37,10 +38,24 @@ $(document).ready(function () {
         }
     });
 
+    var nbr1 = Math.floor((Math.random() * 1000) + 1);
+    var nbr2 = Math.floor((Math.random() * 10) + 1);
+    $('#humanProve').html('What is ' + nbr1 + ' + ' + nbr2 + '?*');
+    $('#proveRegister').focusout(function () {
+       if ($('#proveRegister').val() != nbr1+nbr2) {
+            $('#proveRegister').parent().find('.invalid').remove();
+            $('#proveRegister').parent().append('<span class="invalid">Please reenter verification calculation.</span>');
+            proveValid = true;
+       } else {
+            $('#proveRegister').parent().find('.invalid').remove();
+            proveValid = false;
+       } 
+    });
+
 });
 
 function validateForm() {
-    if (validateRequired() == false || mailValid == false || pswValid == false) {
+    if (validateRequired() == false || mailValid == false || pswValid == false || proveValid==false) {
         $('#registerSubmit').parent().find('.invalid').remove();
         $('#registerSubmit').parent().append('<span class="invalid">Please provide all required information (*) correctly.</span>');
         return false;
@@ -51,7 +66,7 @@ function validateForm() {
 function validateRequired() {
     var req = true;
     $('.required').each(function (index, element) {
-        if ($(element).val()==='') {
+        if ($(element).val() === '') {
             req = false;
         }
     });
