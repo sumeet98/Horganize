@@ -6,7 +6,6 @@ var path = require('path');
 var app = express();
 app.set('port', process.env.PORT || 3000);
 
-app.use(express.static('public'));
 
 app.use(session({
     secret: 'Z5vyQoTAeS',
@@ -18,13 +17,37 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.set('views', __dirname + '/views');
+app.set('view engine', 'pug');
+
+app.use(express.static('public'));
+
+app.use(function(req, res) {
+    res.status(404);
+    res.render('landing_message', {
+        message: 'Sorry, this page does not exist.'
+    });
+ });
+ app.use(function(req, res) {
+    res.status(500);
+    res.render('landing_message', {
+        message: 'Sorry, something went wrong.'
+    });
+ });
+
+
+
+
 app.post('/login', function (request, response) {
     if (checkUserPassword(request.body.emailLogin, request.body.pswLogin)) {
         request.session.username = request.body.emailLogin;
         console.log('succesfull');
         response.sendFile(path.join(__dirname + '/private/dashboard.html'));
     } else {
-        console.log('not succesfull');
+        response.render('landing_start', {
+            displayWarning: true,
+            message: 'Username or password incorrect. Please try again. '
+        })
     }
 });
 

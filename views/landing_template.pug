@@ -1,0 +1,44 @@
+doctype
+html
+
+head
+    meta(charset="utf-8")
+    meta(http.equiv="X-UA-Compatible", content="IE=edge")
+    title Horganize!
+    link(href="https://fonts.googleapis.com/css?family=Raleway", rel="stylesheet")
+    link(rel="stylesheet", type="text/css", media="screen", href="styles/main.css")
+    link(rel="stylesheet", type="text/css", media="screen", href="styles/login.css")
+    script(src="https://code.jquery.com/jquery-3.3.1.min.js", integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=", crossorigin="anonymous")
+
+body
+    div(id="titleSection")
+        img(src="images/background_cropped.png", alt="Login Background")
+        a(href="/login.html")
+            h1 Horganize!
+    form(id="loginForm", method="post", action="/login")
+        div(id="loginContainer")
+            div
+                br
+                br
+                span Keep housing easy and manage all your related stuff.
+            div
+                span Email
+                br
+                input(class="inputField", type="text", id="emailLogin", name="emailLogin")
+                br
+                a(class="link", href="register.html") register
+            div
+                span Password
+                br
+                input(class="inputField", type="password", name="pswLogin")
+                br
+                a(class="link", href="register.html") forgot password?
+            div
+                button(type="submit", class="genButton") Login
+    hr(class="straightLine")
+
+    block content
+
+    footer
+                a(class="link", href="#") contact
+                a(class="link", href="#") about

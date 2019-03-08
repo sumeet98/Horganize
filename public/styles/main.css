@@ -34,6 +34,10 @@ body{
     color: grey;
 }
 
+.warning{
+    border: red;
+}
+
 .genButton {
     border: black;
     border-style: solid;
