@@ -1,0 +1,44 @@
+.container{
+    display: grid;
+    grid-template-columns: 90vw;
+    justify-content: center;
+    justify-items: center;
+}
+h1{
+    text-align: center;
+    margin-top: 25vh;
+    margin-bottom: 7.5vw;
+    font-size: 4vw;
+}
+
+.bigButton{
+    font-size: 2vw;
+    width: 25vw;
+    margin-top: 4vw;
+}
+
+.setUpRow{
+    display: grid;
+    grid-template-columns: 40vw 40vw;
+    grid-column-gap: 5vw;
+    justify-content: center;
+    justify-items: center;
+}
+
+.inActive{
+    display: none;
+}
+
+#newRoomForm{
+    display: grid;
+    grid-template-columns: 40vw 40vw;
+    justify-content: center;
+    justify-items: center;
+}
+
+#newRoomForm input{
+    font-size: 2vw;
+    color: grey;
+}
+
+

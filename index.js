@@ -22,11 +22,20 @@ app.set('view engine', 'pug');
 
 app.use(express.static('public'));
 
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname + '/public/login.html'));
+})
+
 app.post('/login', function (request, response) {
     if (checkUserPassword(request.body.emailLogin, request.body.pswLogin)) {
-        request.session.username = request.body.emailLogin;
-        console.log('succesfull');
-        response.sendFile(path.join(__dirname + '/private/dashboard.html'));
+        if(firstLogin(request.body.emailLogin)){
+            response.sendFile(path.join(__dirname + '/private/setUp.html'));
+            
+        }else{
+            request.session.username = request.body.emailLogin;
+            console.log('succesfull');
+            response.sendFile(path.join(__dirname + '/private/dashboard.html'));
+        }
     } else {
         response.render('landing_start', {
             displayWarning: true,
@@ -57,13 +66,45 @@ app.get('/calendar', function (req, res) {
         res.send('Yahoo!');
         console.log('Authorized request');
     }else{
-        console.log('Unauthorized request');
+        console.log('Unauthorizeds request');
+    }
+});
+
+app.post('/checkRoomNameAvailable/:roomName', function (req, res) {
+    if (roomNameExists(req.params.roomName)) {
+        console.log(req.params.roomName);
+        res.send('false');
+    } else {
+        res.send('true');
+    }
+});
+
+app.post('/registerRoom/:roomName', function (req, res) {
+    console.log('register Room');
+    if (registerRoom(req.params.roomName, req.session.username)) {
+        res.send('true');
+    } else {
+        res.send('false');
     }
 });
 
 app.listen(app.get('port'), function () {
     console.log('Server started up and is now listening on port:' + app.get('port'));
 });
+
+app.use(function(req, res, next) {
+    res.status(404);
+    res.render('landing_message', {
+        message: 'Sorry, this page does not exist.'
+    });
+ });
+
+ app.use(function(err, req, res, next) {
+    res.status(500);
+    res.render('landing_message', {
+        message: 'Sorry, an internal error occured.'
+    });
+ });
 
 function checkUserPassword(email, password) {
     if (email === 'timo.buechert@uoit.net' && password === 'test') {
@@ -78,15 +119,28 @@ function register(body) {
     return true;
 }
 
-app.use(function(req, res, next) {
-    res.status(404);
-    res.render('landing_message', {
-        message: 'Sorry, this page does not exist.'
-    });
- });
- app.use(function(err, req, res, next) {
-    res.status(500);
-    res.render('landing_message', {
-        message: 'Sorry, something went wrong.'
-    });
- });
+function firstLogin(email) {
+    //implement db check here
+    return true;
+}
+
+function roomNameExists(roomName) {
+    //implement db check here
+    if (roomName===':default') {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function registerRoom(roomName, userName) {
+    //implement db check here
+    if (roomName===':default') {
+        console.log('Room registered: ' + roomName +' with User '+ userName);
+        return true;
+    } else {
+        console.log('something')
+        return false;
+    }
+}
+

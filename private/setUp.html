@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Horganize!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/main.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/dashboard.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="styles/setUp.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="scripts/dashboard.js" type="text/javascript"></script>
+    <script src="scripts/setUp.js"></script>
+</head>
+
+<body>
+    <div class="dashboardContainer">
+        <div class="container" id="stepOne">
+            <h1>Hello.</h1>
+            <div class="setUpRow">
+                <button class="bigButton" id="newRoom">create Room</button>
+                <button class="bigButton" id="joinRoom">join existing Room</button>
+            </div>
+        </div>
+        <div class="container" id="createNew">
+            <h1>Create a room.</h1>
+            <div id="newRoomForm">
+                <div>
+                    <input type="text" name="roomName" id="roomName" placeholder="Room Name">
+                    <p id="roomNameInfo"><br></p>
+                </div>
+                <div>
+                    <input type="text" name="roomPassword" id="roomPassword" placeholder="Room Password">
+                    <span id="roomPasswordInfo"></span>
+                </div>
+            </div>
+            <button class="bigButton" id="createRoom">Proceed</button>
+
+        </div>
+        <div class="container" id="joinExisting">
+            <h1>Join a room.</h1>
+
+        </div>
+        <div class="container" id="lastStep">
+            <h1>You're setup.</h1>
+        </div>
+        <div class="progress">
+
+        </div>
+    </div>
+</body>
+
+</html>

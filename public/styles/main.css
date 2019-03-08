@@ -24,7 +24,7 @@ body{
     margin: 8px;
 }
 
-#loginContainer input{
+input{
     font-family: 'Raleway', sans-serif;
     font-size: 16px;
 }
@@ -52,6 +52,25 @@ body{
     margin-top: 1.2em;
   }
 
+
+  .bigButton{
+    border: black;
+    border-style: solid;
+    border-width: thin;
+    font-family: 'Raleway', sans-serif;
+    font-size: 32px;
+    background-color: white;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    padding: 0.3em;
+
+}
+
+.bigButton:hover {
+    box-shadow: 0.5px 0.5px 0.5px inset;
+}
 .featureContainer{
     margin: 40px;
     padding: 20px;
