@@ -22,22 +22,6 @@ app.set('view engine', 'pug');
 
 app.use(express.static('public'));
 
-app.use(function(req, res) {
-    res.status(404);
-    res.render('landing_message', {
-        message: 'Sorry, this page does not exist.'
-    });
- });
- app.use(function(req, res) {
-    res.status(500);
-    res.render('landing_message', {
-        message: 'Sorry, something went wrong.'
-    });
- });
-
-
-
-
 app.post('/login', function (request, response) {
     if (checkUserPassword(request.body.emailLogin, request.body.pswLogin)) {
         request.session.username = request.body.emailLogin;
@@ -93,3 +77,16 @@ function register(body) {
     //implement db registering here
     return true;
 }
+
+app.use(function(req, res, next) {
+    res.status(404);
+    res.render('landing_message', {
+        message: 'Sorry, this page does not exist.'
+    });
+ });
+ app.use(function(err, req, res, next) {
+    res.status(500);
+    res.render('landing_message', {
+        message: 'Sorry, something went wrong.'
+    });
+ });
