@@ -12,8 +12,11 @@ $(document).ready(function () {
             duration: 'fast',
             easing: 'swing'
         });
+        $('#secondPoint').addClass('active');
+        $('#firstPoint').removeClass('active');
         
     });
+
     $('#joinRoom').click(function (e) { 
         $('#stepOne').hide({
             duration: 'fast',
@@ -24,7 +27,8 @@ $(document).ready(function () {
             easing: 'swing'
         });
         
-        
+        $('#secondPoint').addClass('active');
+        $('#firstPoint').removeClass('active');
     });
 
     $('#createRoom').click(function (e) { 
@@ -38,11 +42,19 @@ $(document).ready(function () {
                         duration: 'fast',
                         easing: 'swing'
                     });
+                    $('#finalMessage').html('You`re all set!');
+                    $('#thirdPoint').addClass('active');
+                    $('#secondPoint').removeClass('active');
+                    setTimeout(function () {
+                        window.location.replace('/dashboard');
+                    }, 1000)
                 } else {
                 }
         });
         
     });
+
+  
 
     $('#roomName').keyup(function (e) { 
         $.ajax({

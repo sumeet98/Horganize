@@ -41,4 +41,29 @@ h1{
     color: grey;
 }
 
+#joinExisting input{
+    font-size: 2vw;
+    color: grey;
+}
+
+.point{
+    background-color: white;
+    border-radius: 50%;
+    width: 1vw;
+    height: 1vw;
+    display: inline-block;
+    border-color: grey;
+    margin: 0.2vh;
+}
+
+.active{
+    background-color: black;
+}
+
+.progress{
+    position: absolute;
+    bottom: 3.5vh;
+
+}
+
 

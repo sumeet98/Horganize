@@ -42,13 +42,23 @@
         </div>
         <div class="container" id="joinExisting">
             <h1>Join a room.</h1>
+            <div>
+                <input type="text" name="roomName" id="roomName" placeholder="Room Name">
+                <ul>
+                </ul>
+            </div>
 
         </div>
         <div class="container" id="lastStep">
-            <h1>You're setup.</h1>
+            <h1 id="finalMessage"></h1>
+            <a href="/dashboard"></a>
         </div>
-        <div class="progress">
-
+        <div class="container progress">
+            <div>
+                <span class="point active" id="firstPoint"></span>
+                <span class="point" id="secondPoint"></span>
+                <span class="point" id="thirdPoint"></span>
+            </div>
         </div>
     </div>
 </body>

@@ -29,18 +29,34 @@ app.get('/', function (req, res) {
 app.post('/login', function (request, response) {
     if (checkUserPassword(request.body.emailLogin, request.body.pswLogin)) {
         if(firstLogin(request.body.emailLogin)){
-            response.sendFile(path.join(__dirname + '/private/setUp.html'));
-            
+            request.session.username = request.body.emailLogin;
+            response.redirect('/setup');
         }else{
             request.session.username = request.body.emailLogin;
-            console.log('succesfull');
-            response.sendFile(path.join(__dirname + '/private/dashboard.html'));
+            response.redirect('/dashboard');
+
         }
     } else {
         response.render('landing_start', {
             displayWarning: true,
             message: 'Username or password incorrect. Please try again. '
         })
+    }
+});
+
+app.get('/dashboard', function (req, res) {
+    if (req.session.username && roomAlreadyRegistered(req.session.username)){ //check if room registered!!
+        res.sendFile(path.join(__dirname + '/private/dashboard.html'));
+    }  else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/setup', function (req, res) {
+    if (req.session.username){
+        res.sendFile(path.join(__dirname + '/private/setUp.html'));
+    }  else {
+        res.redirect('/login.html');
     }
 });
 
@@ -105,6 +121,10 @@ app.use(function(req, res, next) {
         message: 'Sorry, an internal error occured.'
     });
  });
+
+function roomAlreadyRegistered(email) {
+    return true; //implement db check here later
+}
 
 function checkUserPassword(email, password) {
     if (email === 'timo.buechert@uoit.net' && password === 'test') {
