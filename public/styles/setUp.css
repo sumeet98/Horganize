@@ -29,14 +29,14 @@ h1{
     display: none;
 }
 
-#newRoomForm{
+.roomForm{
     display: grid;
     grid-template-columns: 40vw 40vw;
     justify-content: center;
     justify-items: center;
 }
 
-#newRoomForm input{
+.roomForm input{
     font-size: 2vw;
     color: grey;
 }
