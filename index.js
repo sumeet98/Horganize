@@ -48,7 +48,10 @@ app.post('/login', function (request, response) {
 
 app.get('/dashboard', function (req, res) {
     if (req.session.username && roomAlreadyRegistered(req.session.username)) { //check if room registered!!
-        res.sendFile(path.join(__dirname + '/private/dashboard.html'));
+        res.render('dashboard_overview',{
+            active: 0,
+            username: req.session.username
+        });
     } else {
         res.redirect('/login.html');
     }
@@ -82,15 +85,6 @@ app.post('/register', function (req, res) {
     }
 
 })
-
-app.get('/calendar', function (req, res) {
-    if (req.session.username) {
-        res.send('Yahoo!');
-        console.log('Authorized request');
-    } else {
-        console.log('Unauthorizeds request');
-    }
-});
 
 app.post('/checkRoomNameAvailable/:roomName', function (req, res) {
     if (req.session.username) {
@@ -142,6 +136,60 @@ app.post('/joinRoom', function (req, res) {
         res.sendStatus(403);
     }
   });
+
+app.get('/logout', function (req, res) {
+    if (req.session.username) {
+        console.log('Logout user: ' + req.session.username);
+        req.session.destroy(function(error){});
+        res.redirect('/login.html');
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/shopping', function (req, res) {
+    if (req.session.username) {
+        res.render('dashboard_shopping', {
+            active: 1,
+            username: req.session.username
+        });
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/tasks', function (req, res) {
+    if (req.session.username) {
+        res.render('dashboard_tasks', {
+            active: 2,
+            username: req.session.username
+        });
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/calendar', function (req, res) {
+    if (req.session.username) {
+        res.render('dashboard_calendar', {
+            active: 3,
+            username: req.session.username
+        });
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/wallet', function (req, res) {
+    if (req.session.username) {
+        res.render('dashboard_wallet', {
+            active: 4,
+            username: req.session.username
+        });
+    } else {
+        res.redirect('/login.html');
+    }
+});
 
 app.listen(app.get('port'), function () {
     console.log('Server started up and is now listening on port:' + app.get('port'));
