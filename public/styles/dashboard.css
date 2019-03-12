@@ -45,7 +45,7 @@ html{
     grid-area: nav;
 }
 
-#navigation ul{
+ul{
     list-style: none;
 }
 

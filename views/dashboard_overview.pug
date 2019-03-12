@@ -1,5 +1,15 @@
 extends dashboard_navigation
 
+block append scripts
+    script(src="scripts/dashboard_overview.js",type="text/javascript")
+
 block content
     div(id="mainContent")
         h3 Welcome #{username}
+        hr
+        p You share your room with 
+        ul(id="roomMates")
+        
+            
+
+

@@ -48,7 +48,7 @@ app.post('/login', function (request, response) {
 
 app.get('/dashboard', function (req, res) {
     if (req.session.username && roomAlreadyRegistered(req.session.username)) { //check if room registered!!
-        res.render('dashboard_overview',{
+        res.render('dashboard_overview', {
             active: 0,
             username: req.session.username
         });
@@ -67,19 +67,15 @@ app.get('/setup', function (req, res) {
 
 
 app.post('/register', function (req, res) {
-    if (req.session.username) {
-        console.log(
-            req.body.emailRegister +
-            req.body.pswRegister +
-            req.body.nameFirstRegister +
-            req.body.nameLastRegister +
-            req.body.adressRegister +
-            req.body.schoolRegister);
-        if (register(req.body)) {
-            res.sendStatus(200);
-        } else {
-            res.sendStatus(403);
-        }
+    console.log(
+        req.body.emailRegister +
+        req.body.pswRegister +
+        req.body.nameFirstRegister +
+        req.body.nameLastRegister +
+        req.body.adressRegister +
+        req.body.schoolRegister);
+    if (register(req.body)) {
+        res.sendStatus(200);
     } else {
         res.sendStatus(403);
     }
@@ -135,12 +131,12 @@ app.post('/joinRoom', function (req, res) {
     } else {
         res.sendStatus(403);
     }
-  });
+});
 
 app.get('/logout', function (req, res) {
     if (req.session.username) {
         console.log('Logout user: ' + req.session.username);
-        req.session.destroy(function(error){});
+        req.session.destroy(function (error) { });
         res.redirect('/login.html');
     } else {
         res.redirect('/login.html');
@@ -186,6 +182,14 @@ app.get('/wallet', function (req, res) {
             active: 4,
             username: req.session.username
         });
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.post('/roommates', function(req, res){
+    if (req.session.username) {
+        res.send(getRoomMatesFromDB(req.session.username))
     } else {
         res.redirect('/login.html');
     }
@@ -267,8 +271,25 @@ function getRoomsFromDB(search) {
 function joinRoom(roomName, psw, username) {
     if (roomName == 'test' && psw == 'test' && username == 'timo.buechert@uoit.net') {
         return true;
-    }else{
+    } else {
         return false;
     }
+}
+
+function getRoomMatesFromDB(email) {
+    //implement DB check here
+    return {
+        "mates": [{
+            "firstName": "Timo",
+            "lastName": "Buechert",
+            "email": "timo.buechert@uoit.net",
+            "school": "UOIT"
+        }, {
+            "firstName": "Max",
+            "lastName": "Miller",
+            "email": "max.miller@durhamcollege.net",
+            "school": "Durham College"
+        }]
+    };
 }
 
