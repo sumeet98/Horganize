@@ -45,10 +45,10 @@ $(document).ready(function () {
        if ($('#proveRegister').val() != nbr1+nbr2) {
             $('#proveRegister').parent().find('.invalid').remove();
             $('#proveRegister').parent().append('<span class="invalid">Please reenter verification calculation.</span>');
-            proveValid = true;
+            proveValid = false;
        } else {
             $('#proveRegister').parent().find('.invalid').remove();
-            proveValid = false;
+            proveValid = true;
        } 
     });
 

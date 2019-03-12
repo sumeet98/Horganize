@@ -27,7 +27,7 @@
         </div>
         <div class="container" id="createNew">
             <h1>Create a room.</h1>
-            <div id="newRoomForm">
+            <div class="roomForm">
                 <div>
                     <input type="text" name="roomName" id="roomName" placeholder="Room Name">
                     <p id="roomNameInfo"><br></p>
@@ -42,13 +42,33 @@
         </div>
         <div class="container" id="joinExisting">
             <h1>Join a room.</h1>
+            <div class="roomForm">
+                    <div>
+                        <input type="text" name="roomNameJoin" id="roomNameJoin" placeholder="Room Name">
+                        <p id="joinRoomInfo"></p>
+                    </div>
+                    <div>
+                        <input type="password" name="roomPasswordJoin" id="roomPasswordJoin" placeholder="Room Password">
+                        <p id="roomPasswordJoinInfo"></p>
+                    </div>
+                </div>
+            <div>
+                <button class="bigButton" id="joinRoomButton">Join Room</button>
+                
+                
+            </div>
 
         </div>
         <div class="container" id="lastStep">
-            <h1>You're setup.</h1>
+            <h1 id="finalMessage"></h1>
+            <a href="/dashboard"></a>
         </div>
-        <div class="progress">
-
+        <div class="container progress">
+            <div>
+                <span class="point active" id="firstPoint"></span>
+                <span class="point" id="secondPoint"></span>
+                <span class="point" id="thirdPoint"></span>
+            </div>
         </div>
     </div>
 </body>

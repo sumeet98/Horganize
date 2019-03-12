@@ -1,0 +1,38 @@
+extends dashboard_template
+
+block navigation
+    div(id="navHead")
+        h2 Horganize
+    div(id="navigation")
+        ul
+            if active==0
+                li(class="active") 
+                    a(href="/dashboard", class="link") Overview
+            else
+                li 
+                    a(href="/dashboard", class="link") Overview
+            if active==1
+                li(class="active")
+                    a(href="/shopping", class="link") Shopping List
+            else
+                li 
+                    a(href="/shopping", class="link") Shopping List
+            if active==2
+                li(class="active")
+                    a(href="/tasks", class="link") Tasks
+            else
+                li
+                    a(href="/tasks", class="link") Tasks
+            if active==3
+                li(class="active")
+                    a(href="/calendar", class="link") Calendar
+            else 
+                li
+                    a(href="/calendar", class="link") Calendar
+            if active==4
+                li(class="active")
+                    a(href="/wallet", class="link") Wallet
+            else
+                li
+                    a(href="/wallet", class="link") Wallet
+    block content
