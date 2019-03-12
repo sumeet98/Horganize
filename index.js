@@ -4,6 +4,8 @@ var uuid = require('uuid');
 var session = require('express-session');
 var path = require('path');
 var mongoose = require('mongoose');
+var data_access = require('./backend_scripts/data_access')
+var bcrypt = require('bcrypt');
 var app = express();
 app.set('port', process.env.PORT || 3000);
 mongoose.connect('mongodb://localhost:27017/horganize', { useNewUrlParser: true });
@@ -31,21 +33,7 @@ app.get('/', function (req, res) {
 })
 
 app.post('/login', function (request, response) {
-    if (checkUserPassword(request.body.emailLogin, request.body.pswLogin)) {
-        if (firstLogin(request.body.emailLogin)) {
-            request.session.username = request.body.emailLogin;
-            response.redirect('/setup');
-        } else {
-            request.session.username = request.body.emailLogin;
-            response.redirect('/dashboard');
-
-        }
-    } else {
-        response.render('landing_start', {
-            displayWarning: true,
-            message: 'Username or password incorrect. Please try again. '
-        })
-    }
+    data_access.getUser(request, response, performLogin);
 });
 
 app.get('/dashboard', function (req, res) {
@@ -69,19 +57,8 @@ app.get('/setup', function (req, res) {
 
 
 app.post('/register', function (req, res) {
-    if (register(req.body)) {
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(403);
-    }
-    
-    console.log(
-        req.body.emailRegister +
-        req.body.pswRegister +
-        req.body.nameFirstRegister +
-        req.body.nameLastRegister +
-        req.body.adressRegister +
-        req.body.schoolRegister);
+    hashedPassword = bcrypt.hashSync(req.body.pswRegister, 8);
+    data_access.register(req, res, hashedPassword, registerDone);
 });
 
 app.post('/checkRoomNameAvailable/:roomName', function (req, res) {
@@ -137,9 +114,17 @@ app.post('/joinRoom', function (req, res) {
 
 app.get('/logout', function (req, res) {
     if (req.session.username) {
-        console.log('Logout user: ' + req.session.username);
-        req.session.destroy(function (error) { });
-        res.redirect('/login.html');
+        log(req.session.username + ' going to be logged out.');
+        req.session.destroy(function (error) {
+            if (error) {
+                log('Logout finished out with errors.');
+                res.redirect('/dashboard');
+            } else {
+                log('Successfully logged out.');
+                res.redirect('/login.html');
+            }
+         });
+        
     } else {
         res.redirect('/login.html');
     }
@@ -198,7 +183,7 @@ app.post('/roommates', function (req, res) {
 });
 
 app.listen(app.get('port'), function () {
-    console.log('Server started up and is now listening on port:' + app.get('port'));
+    log('Server started up and is now listening on port:' + app.get('port'));
 });
 
 app.use(function (req, res, next) {
@@ -217,35 +202,6 @@ app.use(function (err, req, res, next) {
 
 function roomAlreadyRegistered(email) {
     return true; //implement db check here later
-}
-
-function checkUserPassword(email, password) {
-    if (email === 'timo.buechert@uoit.net' && password === 'test') {
-        return true; //implement db check here later
-    } else {
-        return false;
-    }
-}
-
-function register(body) {
-    new User({  email: body.emailRegister, 
-                firstName: body.nameFirstRegister, 
-                lastName: body.nameLastRegister, 
-                adress: body.adressRegister, 
-                school: body.schoolRegister, 
-                pswHashed: body.pswRegister 
-            }).save(function (error) {
-                if (error) {
-                    return false;
-                } else {
-                    return true;
-                }
-            });
-}
-
-function firstLogin(email) {
-    //implement db check here
-    return true;
 }
 
 function roomNameExists(roomName) {
@@ -313,17 +269,81 @@ function initDB() {
     userSchema = new mongoose.Schema({
         email: {
             type: String,
-            validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Must be a valid email adress.'],
+            validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please enter a valid email adress.'],
             index: true,
-            unique: true
+            unique: true,
+            require: true
         },
-        firstName: String,
-        lastName: String,
+        firstName: { type: String, require: true },
+        lastName: { type: String, require: true },
         adress: String,
-        school: { type: String, enum: ['UOIT', 'Durham College', 'Trent University'] },
-        pswHashed: String
+        school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
+        pswHashed: { type: String, require: true },
+        room: String,
     }, { collection: 'users' });
     User = mongoose.model('users', userSchema);
 
 }
 
+function registerDone(req, res, error) {
+
+    if (error) {
+        //error name: 'MongoError' code: 11000 --> Duplicate Keys
+        //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
+
+        if (error.name == 'MongoError' && error.code == 11000) {
+            res.render('landing_message', {
+                message: 'The provided email adress is already registered.'
+            });
+        } else if (error.name == 'ValidatorError') {
+            res.status(400);
+            res.render('landing_message', {
+                message: result.message
+            });
+        } else {
+            res.status(400);
+            res.render('landing_message', {
+                message: 'An error occured during registration.'
+            });
+        }
+
+    } else {
+        res.status(200);
+        res.render('landing_message', {
+            message: 'Registration successful. You can now login.'
+        });
+    }
+}
+
+function performLogin(req, res, user) {
+    if (user) {
+        if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
+            if (user.room == '') {
+                req.session.username = req.body.emailLogin;
+                log(req.session.username + ' successfully logged in.');
+                res.redirect('/setup');
+            } else {
+                req.session.username = req.body.emailLogin;
+                log(req.session.username + ' successfully logged in.');
+                res.redirect('/dashboard');
+            }
+        } else {
+            log(req.session.username + ' attempted login.');
+            res.render('landing_start', {
+                displayWarning: true,
+                message: 'Username or password incorrect. Please try again. '
+            })
+        }
+    } else {
+        log(req.session.username + ' attempted login.');
+        res.render('landing_start', {
+            displayWarning: true,
+            message: 'Username or password incorrect. Please try again. '
+        })
+    }
+}
+
+
+function log(message) {
+    console.log(new Date().getTime() +': ' + message);
+}
