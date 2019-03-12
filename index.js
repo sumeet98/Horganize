@@ -3,9 +3,11 @@ var bodyParser = require('body-parser');
 var uuid = require('uuid');
 var session = require('express-session');
 var path = require('path');
+var mongoose = require('mongoose');
 var app = express();
 app.set('port', process.env.PORT || 3000);
-
+mongoose.connect('mongodb://localhost:27017/horganize', { useNewUrlParser: true });
+initDB();
 
 app.use(session({
     secret: 'Z5vyQoTAeS',
@@ -67,6 +69,12 @@ app.get('/setup', function (req, res) {
 
 
 app.post('/register', function (req, res) {
+    if (register(req.body)) {
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(403);
+    }
+    
     console.log(
         req.body.emailRegister +
         req.body.pswRegister +
@@ -74,13 +82,7 @@ app.post('/register', function (req, res) {
         req.body.nameLastRegister +
         req.body.adressRegister +
         req.body.schoolRegister);
-    if (register(req.body)) {
-        res.sendStatus(200);
-    } else {
-        res.sendStatus(403);
-    }
-
-})
+});
 
 app.post('/checkRoomNameAvailable/:roomName', function (req, res) {
     if (req.session.username) {
@@ -187,7 +189,7 @@ app.get('/wallet', function (req, res) {
     }
 });
 
-app.post('/roommates', function(req, res){
+app.post('/roommates', function (req, res) {
     if (req.session.username) {
         res.send(getRoomMatesFromDB(req.session.username))
     } else {
@@ -226,8 +228,19 @@ function checkUserPassword(email, password) {
 }
 
 function register(body) {
-    //implement db registering here
-    return true;
+    new User({  email: body.emailRegister, 
+                firstName: body.nameFirstRegister, 
+                lastName: body.nameLastRegister, 
+                adress: body.adressRegister, 
+                school: body.schoolRegister, 
+                pswHashed: body.pswRegister 
+            }).save(function (error) {
+                if (error) {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
 }
 
 function firstLogin(email) {
@@ -291,5 +304,26 @@ function getRoomMatesFromDB(email) {
             "school": "Durham College"
         }]
     };
+}
+
+function initDB() {
+
+    //init Schmemas
+
+    userSchema = new mongoose.Schema({
+        email: {
+            type: String,
+            validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Must be a valid email adress.'],
+            index: true,
+            unique: true
+        },
+        firstName: String,
+        lastName: String,
+        adress: String,
+        school: { type: String, enum: ['UOIT', 'Durham College', 'Trent University'] },
+        pswHashed: String
+    }, { collection: 'users' });
+    User = mongoose.model('users', userSchema);
+
 }
 
