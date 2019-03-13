@@ -1,6 +1,22 @@
 extends dashboard_navigation
 
+block append scripts
+    script(src="scripts/dashboard_shopping.js",type="text/javascript")
 
 block content
     div(id="mainContent")
-        h3 Welcome #{username}
+        h3 Shopping List for Room:  #{roomName}
+        hr
+        div(id="tableShopping")
+            table(id="shoppingList" class="table")
+        div(class="input triple")
+            div
+                span Item: 
+                input(id="newItem")
+            div
+                span Quantity: 
+                input(id="quantity")
+            div 
+                button(class="genButton" id="append") Append
+        button(class="genButton" id="deleteAll") Delete all
+        p(id="message")

@@ -64,3 +64,32 @@ ul{
     grid-area: cont;
     padding: 0 20px;
 }
+
+#tableShopping{
+    height: 200px;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+.done{
+    text-decoration: line-through;
+}
+
+.triple{
+    display: grid;
+    grid-template-columns: 250px 250px auto;
+    
+}
+
+.triple .genButton{
+    margin: 3px;
+}
+
+.table{
+    table-layout: fixed;
+}
+
+.table td{
+    width: 100px;
+}
+

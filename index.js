@@ -126,6 +126,7 @@ app.get('/logout', function (req, res) {
          });
         
     } else {
+        res.status(403);
         res.redirect('/login.html');
     }
 });
@@ -134,9 +135,11 @@ app.get('/shopping', function (req, res) {
     if (req.session.username) {
         res.render('dashboard_shopping', {
             active: 1,
+            roomName: req.session.room,
             username: req.session.username
         });
     } else {
+        res.status(403);
         res.redirect('/login.html');
     }
 });
@@ -148,6 +151,7 @@ app.get('/tasks', function (req, res) {
             username: req.session.username
         });
     } else {
+        res.status(403);
         res.redirect('/login.html');
     }
 });
@@ -159,6 +163,7 @@ app.get('/calendar', function (req, res) {
             username: req.session.username
         });
     } else {
+        res.status(403);
         res.redirect('/login.html');
     }
 });
@@ -170,6 +175,7 @@ app.get('/wallet', function (req, res) {
             username: req.session.username
         });
     } else {
+        res.status(403);
         res.redirect('/login.html');
     }
 });
@@ -178,9 +184,61 @@ app.post('/roommates', function (req, res) {
     if (req.session.username) {
         res.send(getRoomMatesFromDB(req.session.username))
     } else {
+        res.status(403);
         res.redirect('/login.html');
     }
 });
+
+app.get('/getShoppingList', function (req, res) {
+    let tempShoppingList = {
+        "items": [{
+            "name": "Milk 1l",
+            "quantity": "2",
+            "done": false
+        }, {
+            "name": "Bin Bags BigPack",
+            "quantity": "1",
+            "done": false
+        }, {
+            "name": "Apples",
+            "quantity": "8",
+            "done": true
+        }]
+    };
+    
+    if (req.session.username) {
+        data_access.getShoppingList(req, res, getShoppingListDone);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+  });
+
+  function getShoppingListDone(req, res, list) {
+          res.send(list); 
+  }
+
+  app.get('/deleteAllShoppingItems', function (req, res) {
+      data_access.deleteShopping(req, res, callbackBoolean);
+  });
+
+  app.post('/putShoppingList', function (req, res) {
+    data_access.addShopping(req, res, callbackBoolean);
+  });
+
+  app.post('/putShoppingListChecked', function (req, res) {
+    data_access.addShoppingChecked(req, res, callbackBoolean);
+  });
+
+  function callbackBoolean(req, res, error) {
+      if (error) {
+        res.send(false);
+      } else {
+        res.send(true);
+      }
+  }
+
+
 
 app.listen(app.get('port'), function () {
     log('Server started up and is now listening on port:' + app.get('port'));
@@ -262,35 +320,13 @@ function getRoomMatesFromDB(email) {
     };
 }
 
-function initDB() {
-
-    //init Schmemas
-
-    userSchema = new mongoose.Schema({
-        email: {
-            type: String,
-            validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please enter a valid email adress.'],
-            index: true,
-            unique: true,
-            require: true
-        },
-        firstName: { type: String, require: true },
-        lastName: { type: String, require: true },
-        adress: String,
-        school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
-        pswHashed: { type: String, require: true },
-        room: String,
-    }, { collection: 'users' });
-    User = mongoose.model('users', userSchema);
-
-}
 
 function registerDone(req, res, error) {
-
+    
     if (error) {
         //error name: 'MongoError' code: 11000 --> Duplicate Keys
         //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
-
+        
         if (error.name == 'MongoError' && error.code == 11000) {
             res.render('landing_message', {
                 message: 'The provided email adress is already registered.'
@@ -324,6 +360,7 @@ function performLogin(req, res, user) {
                 res.redirect('/setup');
             } else {
                 req.session.username = req.body.emailLogin;
+                req.session.room = user.room;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/dashboard');
             }
@@ -346,4 +383,40 @@ function performLogin(req, res, user) {
 
 function log(message) {
     console.log(new Date().getTime() +': ' + message);
+}
+
+function initDB() {
+
+    //init Schmemas
+
+    userSchema = new mongoose.Schema({
+        email: {
+            type: String,
+            validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please enter a valid email adress.'],
+            index: true,
+            unique: true,
+            require: true
+        },
+        firstName: { type: String, require: true },
+        lastName: { type: String, require: true },
+        adress: String,
+        school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
+        pswHashed: { type: String, require: true },
+        room: String,
+    }, { collection: 'users' });
+    User = mongoose.model('users', userSchema);
+
+    shoppingSchema = new mongoose.Schema({
+        room: {
+            type: String,
+            index: true,
+            unique: true,
+            require: true
+        },
+        items: [{   name : String,
+                    quantity : Number,
+                    done: Boolean}]
+    }, { collection: 'shoppingLists' });
+    List = mongoose.model('shoppingLists', shoppingSchema);
+
 }
