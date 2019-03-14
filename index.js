@@ -61,33 +61,44 @@ app.post('/register', function (req, res) {
     data_access.register(req, res, hashedPassword, registerDone);
 });
 
-app.post('/checkRoomNameAvailable/:roomName', function (req, res) {
+app.post('/checkRoomExists/:roomName', function (req, res) {
     if (req.session.username) {
-
-        if (roomNameExists(req.params.roomName)) {
-            console.log(req.params.roomName);
-            res.send('false');
-        } else {
-            res.send('true');
-        }
+        data_access.roomExists(req, res, callbackBoolean)
     } else {
-        res.sendStatus(403);
+        res.status(403);
+        res.redirect('/login.html');
     }
 });
 
 app.post('/registerRoom/:roomName', function (req, res) {
     console.log('register Room');
     if (req.session.username) {
-        if (registerRoom(req.params.roomName, req.session.username)) {
-            res.send('true');
-        } else {
-            res.send('false');
-        }
+        data_access.addRoom(req, res, registerRoomDone)
 
     } else {
-        res.sendStatus(403);
+        res.status(403);
+        res.redirect('/login.html');
     }
 });
+
+function registerRoomDone(req, res, error) {
+    if (error) {
+        //error name: 'MongoError' code: 11000 --> Duplicate Keys
+        //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
+
+        if (error.name == 'MongoError' && error.code == 11000) {
+
+        } else {
+
+        }
+        res.status(500);
+        res.send('false');
+
+    } else {
+        res.status(200);
+        res.send('true');
+    }
+}
 
 app.post('/getRooms/:search', function (req, res) {
     if (req.session.username) {
@@ -123,8 +134,8 @@ app.get('/logout', function (req, res) {
                 log('Successfully logged out.');
                 res.redirect('/login.html');
             }
-         });
-        
+        });
+
     } else {
         res.status(403);
         res.redirect('/login.html');
@@ -205,38 +216,67 @@ app.get('/getShoppingList', function (req, res) {
             "done": true
         }]
     };
-    
+
     if (req.session.username) {
         data_access.getShoppingList(req, res, getShoppingListDone);
     } else {
         res.status(403);
         res.redirect('/login.html');
     }
-  });
+});
 
-  function getShoppingListDone(req, res, list) {
-          res.send(list); 
-  }
+app.get('/admin', function (req, res) {
+    if (req.session.username && req.session.admin) {
+        res.render('dashboard_admin', {
+            username: req.session.username
+        });
+    } else if (req.session.username) {
+        res.status(404);
+        res.redirect('/dashboard');
 
-  app.get('/deleteAllShoppingItems', function (req, res) {
-      data_access.deleteShopping(req, res, callbackBoolean);
-  });
+    } else {
+        res.status(404);
+        res.redirect('/login.html');
+    }
+});
 
-  app.post('/putShoppingList', function (req, res) {
+
+function getShoppingListDone(req, res, list) {
+    res.send(list);
+}
+
+app.get('/deleteAllShoppingItems', function (req, res) {
+    data_access.deleteShopping(req, res, callbackBoolean);
+});
+
+app.post('/putShoppingList', function (req, res) {
     data_access.addShopping(req, res, callbackBoolean);
-  });
+});
 
-  app.post('/putShoppingListChecked', function (req, res) {
+app.post('/putShoppingListChecked', function (req, res) {
     data_access.addShoppingChecked(req, res, callbackBoolean);
-  });
+});
 
-  function callbackBoolean(req, res, error) {
-      if (error) {
+function callbackBoolean(req, res, error) {
+    if (error) {
         res.send(false);
-      } else {
+    } else {
         res.send(true);
-      }
-  }
+    }
+}
+
+app.get('/wipeAll', function (req, res) {
+    if (req.session.username && req.session.admin) {
+        data_access.wipeAll(req, res, callbackBoolean);
+    } else if (req.session.username) {
+        res.status(404);
+        res.redirect('/dashboard');
+
+    } else {
+        res.status(404);
+        res.redirect('/login.html');
+    }
+});
 
 
 
@@ -262,14 +302,7 @@ function roomAlreadyRegistered(email) {
     return true; //implement db check here later
 }
 
-function roomNameExists(roomName) {
-    //implement db check here
-    if (roomName === ':default') {
-        return false;
-    } else {
-        return true;
-    }
-}
+
 
 function registerRoom(roomName, userName) {
     //implement db check here
@@ -322,11 +355,11 @@ function getRoomMatesFromDB(email) {
 
 
 function registerDone(req, res, error) {
-    
+
     if (error) {
         //error name: 'MongoError' code: 11000 --> Duplicate Keys
         //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
-        
+
         if (error.name == 'MongoError' && error.code == 11000) {
             res.render('landing_message', {
                 message: 'The provided email adress is already registered.'
@@ -356,11 +389,13 @@ function performLogin(req, res, user) {
         if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
             if (user.room == '') {
                 req.session.username = req.body.emailLogin;
+                req.session.admin = user.admin;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/setup');
             } else {
                 req.session.username = req.body.emailLogin;
                 req.session.room = user.room;
+                req.session.admin = user.admin;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/dashboard');
             }
@@ -382,7 +417,7 @@ function performLogin(req, res, user) {
 
 
 function log(message) {
-    console.log(new Date().getTime() +': ' + message);
+    console.log(new Date().getTime() + ': ' + message);
 }
 
 function initDB() {
@@ -403,6 +438,7 @@ function initDB() {
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
         pswHashed: { type: String, require: true },
         room: String,
+        admin: Boolean
     }, { collection: 'users' });
     User = mongoose.model('users', userSchema);
 
@@ -413,10 +449,23 @@ function initDB() {
             unique: true,
             require: true
         },
-        items: [{   name : String,
-                    quantity : Number,
-                    done: Boolean}]
+        items: [{
+            name: String,
+            quantity: Number,
+            done: Boolean
+        }]
     }, { collection: 'shoppingLists' });
     List = mongoose.model('shoppingLists', shoppingSchema);
+
+    roomSchema = new mongoose.Schema({
+        name: {
+            type: String,
+            index: true,
+            unique: true,
+            require: true
+        },
+        secret: { require: true, type: String }
+    }, { collection: 'roomList' });
+    Room = mongoose.model('roomList', roomSchema);
 
 }

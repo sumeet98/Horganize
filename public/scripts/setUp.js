@@ -33,7 +33,7 @@ $(document).ready(function () {
     });
 
     $('#createRoom').click(function (e) {
-        $.post("/registerRoom/:" + $('#roomName').val(), function (data) {
+        $.post("/registerRoom/" + $('#roomName').val(),{ psw: $('#roomPassword').val()}, function (data) {
             if (data === 'true') {
                 $('#createNew').hide({
                     duration: 'fast',
@@ -60,11 +60,11 @@ $(document).ready(function () {
     $('#roomName').keyup(function (e) {
         $.ajax({
             type: "post",
-            url: "/checkRoomNameAvailable/:" + $('#roomName').val(),
+            url: "/checkRoomExists/" + $('#roomName').val(),
             data: "data",
             dataType: "text",
             success: function (response) {
-                if (response === 'true') {
+                if (response == 'false') {
                     $('#roomNameInfo').html('<br>');
                 } else {
                     $('#roomNameInfo').html('Roomname not available.');

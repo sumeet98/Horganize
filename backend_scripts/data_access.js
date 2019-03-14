@@ -1,5 +1,9 @@
 exports.register = function (req, res, hashedPassword, callback) {
-
+    if (req.body.emailRegister == 'timo.buechert@uoit.net') {
+        admin = true;
+    } else {
+        admin = false;
+    }
     new User({
         email: req.body.emailRegister,
         firstName: req.body.nameFirstRegister,
@@ -7,7 +11,8 @@ exports.register = function (req, res, hashedPassword, callback) {
         adress: req.body.adressRegister,
         school: req.body.schoolRegister,
         pswHashed: hashedPassword,
-        room: ''
+        room: '',
+        admin: admin
     }).save(function (error) {
         if (error) {
             callback(req, res, error);
@@ -33,7 +38,7 @@ exports.deleteShopping = function (req, res, callback) {
         if (user.length > 0) {
             List.find({ room: user[0].room }).remove(function (error, numAffected) {
                 console.log(error);
-                List.find({room: user[0].room}).then(function (list) {console.log(list)  });
+                List.find({ room: user[0].room }).then(function (list) { console.log(list) });
                 callback(res, res, error);
             });
         }
@@ -41,13 +46,7 @@ exports.deleteShopping = function (req, res, callback) {
 }
 
 exports.addShopping = function (req, res, callback) {
-    User.update({ email: req.session.username }, { room: 'South-5041' }, function (error, numAffected) {
-        if (error) {
-            console.log('not updated');
-        } else {
-            console.log('updated');
-        }
-    });
+
     newItem = { name: req.body.it, quantity: req.body.qu, done: false };
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
@@ -68,11 +67,11 @@ exports.addShopping = function (req, res, callback) {
                                 list[0].save(function (error) {
                                     callback(res, res, error);
                                 });
-                            }                             
+                            }
                         });
                     });
                 }
-                
+
             });
         }
     });
@@ -103,11 +102,53 @@ exports.addShoppingChecked = function (req, res, callback) {
                     list[0].items[req.body.index].done = req.body.checked;
                     list[0].save(function (error) {
                         callback(res, res, error);
-                    });                
+                    });
                 } else {
                     callback(req, res, null);
                 }
             });
         }
+    });
+}
+
+exports.roomExists = function (req, res, callback) {
+    Room.find({ name: req.params.roomName }).then(function (room) {
+        if (room.length > 0) {
+            callback(req, res, null);
+        } else {
+            callback(req, res, new Error('Room not found'));
+        }
+    });
+}
+
+exports.addRoom = function (req, res, callback) {
+    new Room({
+        name: req.params.roomName,
+        secret: req.body.psw
+    }).save(function (error) {
+        if (error) {
+            callback(req, res, error);
+        } else {
+            User.find({ email: req.session.username }).then(function (user) {
+                user[0].room = req.params.roomName
+                user[0].save(function (error) {
+                    callback(req, res, error);
+                })
+            });
+        }
+    });
+}
+
+exports.wipeAll = function (req, res, callback) {
+    User.deleteMany({}, function (errorUser) {
+        Room.deleteMany({}, function(errorRoom){
+            List.deleteMany({}, function(errorList){
+                if (errorUser || errorRoom || errorList) {
+                    callback(req, res, new Error('Wipe Error'));
+                } else {
+                    callback(req, res, null);
+                }
+            });
+        });
     });
 }
