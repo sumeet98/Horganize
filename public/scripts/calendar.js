@@ -1,153 +1,113 @@
-window.onload = function() {
-  //Copyright 1996 - Tomer and Yehuda Shiran
-  //Feel free to "steal" this code provided that you leave this notice as is.
+//code from calendar from stackoverflow: https://stackoverflow.com/questions/43316726/build-a-calendar-using-javascript-jquery
 
-  //^^^^ I CHANGED MOST OF IT UP USED THEIR TEMPLATE ONLY
+var CURRENT_DATE = new Date();
+var d = new Date();
 
+var content = 'January February March April May June July August September October November December'.split(' ');
+var weekDayName = 'SUN MON TUES WED THURS FRI'.split(' ');
+var daysOfMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-  setCal()
-
-
-  function leapYear(year) {
-  if (year % 4 == 0)
-  return true
-  return false
+// Returns the day of week which month starts (eg 0 for Sunday, 1 for Monday, etc.)
+function getCalendarStart(dayOfWeek, currentDate) {
+  var date = currentDate - 1;
+  var startOffset = (date % 7) - dayOfWeek;
+  if (startOffset > 0) {
+    startOffset -= 7;
   }
-
-  function getDays(month, year) {
-  var ar = new Array(12)
-  ar[0] = 31
-  ar[1] = (leapYear(year)) ? 29 : 28
-  ar[2] = 31
-  ar[3] = 30
-  ar[4] = 31
-  ar[5] = 30
-  ar[6] = 31
-  ar[7] = 31
-  ar[8] = 30
-  ar[9] = 31
-  ar[10] = 30
-  ar[11] = 31
-
-  return ar[month]
-  }
-
-  function getMonthName(month) {
-  var ar = new Array(12)
-  ar[0] = "January"
-  ar[1] = "February"
-  ar[2] = "March"
-  ar[3] = "April"
-  ar[4] = "May"
-  ar[5] = "June"
-  ar[6] = "July"
-  ar[7] = "August"
-  ar[8] = "September"
-  ar[9] = "October"
-  ar[10] = "November"
-  ar[11] = "December"
-
-  return ar[month]
-  }
-
-  function setCal() {
-  var now = new Date()
-  var year = now.getYear()
-  if (year < 1000)
-  year+=1900
-  var month = now.getMonth()
-  var monthName = getMonthName(month)
-  var date = now.getDate()
-  now = null
-
-  var firstDayInstance = new Date(year, month, 1)
-  var firstDay = firstDayInstance.getDay()
-  firstDayInstance = null
-
-  var days = getDays(month, year)
-
-  drawCal(firstDay + 1, days, date, monthName, year)
-  }
-
-  function drawCal(firstDay, lastDate, date, monthName, year) {
-  // constant table settings
-  var headerHeight = 50 // height of the table's header cell
-  var border = 2 // 3D height of table's border
-  var cellspacing = 4 // width of table's border
-  var headerColor = "black" // color of table's header
-  var headerSize = "+3" // size of tables header font
-  var colWidth = 60 // width of columns in table
-  var dayCellHeight = 25 // height of cells containing days of the week
-  var dayColor = "black" // color of font representing week days
-  var cellHeight = 40 // height of cells representing dates in the calendar
-  var todayColor = "red" // color specifying today's date in the calendar
-
-
-  // create basic table structure
-  var text = "" // initialize accumulative variable to empty string
-  text += '<CENTER>'
-  text += '<TABLE BORDER=' + border + ' CELLSPACING=' + cellspacing + '>' // table settings
-  text += '<TH COLSPAN=7 HEIGHT=' + headerHeight + '>' // create table header cell
-  text += '<FONT COLOR="' + headerColor + '" SIZE=' + headerSize + '>' // set font for table header
-  text += monthName + ' ' + year
-  text += '</FONT>' // close table header's font settings
-  text += '</TH>' // close header cell
-
-  // variables to hold constant settings
-  var openCol = '<TD WIDTH=' + colWidth + ' HEIGHT=' + dayCellHeight + '>'
-  openCol += '<FONT COLOR="' + dayColor + '">'
-  var closeCol = '</FONT></TD>'
-
-  // create array of abbreviated day names
-  var weekDay = new Array(7)
-  weekDay[0] = "Sun"
-  weekDay[1] = "Mon"
-  weekDay[2] = "Tues"
-  weekDay[3] = "Wed"
-  weekDay[4] = "Thu"
-  weekDay[5] = "Fri"
-  weekDay[6] = "Sat"
-
-  // create first row of table to set column width and specify week day
-  text += '<TR ALIGN="center" VALIGN="center">'
-  for (var dayNum = 0; dayNum < 7; ++dayNum) {
-  text += openCol + weekDay[dayNum] + closeCol
-  }
-  text += '</TR>'
-
-  // declaration and initialization of two variables to help with tables
-  var digit = 1
-  var curCell = 1
-
-  for (var row = 1; row <= Math.ceil((lastDate + firstDay - 1) / 7); ++row) {
-  text += '<TR ALIGN="right" VALIGN="top">'
-  for (var col = 1; col <= 7; ++col) {
-  if (digit > lastDate)
-  break
-  if (curCell < firstDay) {
-  text += '<TD></TD>';
-  curCell++
-  } else {
-  if (digit == date) { // current cell represent today's date
-  text += '<TD HEIGHT=' + cellHeight + '>'
-  text += '<FONT COLOR="' + todayColor + '">'
-  text += digit
-  text += '</FONT><BR>'
-  text += '</FONT>'
-  text += '</TD>'
-  } else
-  text += '<TD HEIGHT=' + cellHeight + '>' + digit + '</TD>'
-  digit++
-  }
-  }
-  text += '</TR>'
-  }
-
-  // close all basic table tags
-  text += '</TABLE>'
-  text += '</CENTER>'
-
-  // print accumulative HTML string
-  document.write(text)
+  return Math.abs(startOffset);
 }
+
+// Render Calendar
+function renderCalendar(startDay, totalDays, currentDate) {
+  var currentRow = 1;
+  var currentDay = startDay;
+  var $table = $('table');
+  var $week = getCalendarRow();
+  var $day;
+  var i = 1;
+
+  for (; i <= totalDays; i++) {
+    $day = $week.find('td').eq(currentDay);
+    $day.text(i);
+    if (i === currentDate) {
+      $day.addClass('today');
+    }
+
+    // +1 next day until Saturday (6), then reset to Sunday (0)
+    currentDay = ++currentDay % 7;
+
+    // Generate new row when day is Saturday, but only if there are
+    // additional days to render
+    if (currentDay === 0 && (i + 1 <= totalDays)) {
+      $week = getCalendarRow();
+      currentRow++;
+    }
+  }
 }
+
+// Clear generated calendar
+function clearCalendar() {
+  var $trs = $('tr').not(':eq(0)');
+  $trs.remove();
+  $('.month-year').empty();
+}
+
+// Generates table row used when rendering Calendar
+function getCalendarRow() {
+  var $table = $('table');
+  var $tr = $('<tr/>');
+  for (var i = 0, len = 7; i < len; i++) {
+    $tr.append($('<td/>'));
+  }
+  $table.append($tr);
+  return $tr;
+}
+
+function myCalendar() {
+  var month = d.getMonth();
+  var day = d.getDay();
+  var year = d.getFullYear();
+  var date = d.getDate();
+  var totalDaysOfMonth = daysOfMonth[month];
+  var counter = 1;
+
+  var $h3 = $('<h3>');
+
+  $h3.text(content[month] + ' ' + year);
+  $h3.appendTo('.month-year');
+
+  var dateToHighlight = 0;
+
+  // Determine if Month && Year are current for Date Highlight
+  if (CURRENT_DATE.getMonth() === month && CURRENT_DATE.getFullYear() === year) {
+    dateToHighlight = date;
+  }
+
+  //Getting February Days Including The Leap Year
+  if (month === 1) {
+    if ((year % 100 !== 0) && (year % 4 === 0) || (year % 400 === 0)) {
+      totalDaysOfMonth = 29;
+    }
+  }
+
+  // Get Start Day
+  renderCalendar(getCalendarStart(day, date), totalDaysOfMonth, dateToHighlight);
+};
+
+function navigationHandler(dir) {
+  d.setMonth(d.getMonth() + dir);
+  clearCalendar();
+  myCalendar();
+}
+
+$(document).ready(function() {
+  // Bind Events
+  $('.prev-month').click(function() {
+    navigationHandler(-1);
+  });
+  $('.next-month').click(function() {
+    navigationHandler(1);
+  });
+  // Generate Calendar
+  myCalendar();
+});

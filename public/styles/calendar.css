@@ -1,1 +1,35 @@
+body {
+  background-image: url("../public/images/background.jpg")
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover;
+}
+.form label {
+  margin-top: 0px;
+  float: left;
+  margin-right: 10px;
+}
+.form div {
+  margin-top: 0px;
+  margin-bottom: 15px;
+}
 
+.container {
+  margin-top: 80px;
+  margin-bottom:0px;
+}
+
+th {
+  height: 30px;
+  text-align: center;
+  font-weight: 700;
+}
+
+td {
+  height: 100px;
+}
+
+.today {
+  background-color: green;
+}

@@ -1,3 +1,3 @@
 # Horganize
 
-calendar code inspired from http://www.javascriptkit.com/script/cut20.shtml
+calendar code inspired from https://stackoverflow.com/questions/43316726/build-a-calendar-using-javascript-jquery
