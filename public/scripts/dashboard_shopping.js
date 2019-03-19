@@ -17,16 +17,23 @@ $(document).ready(function () {
 
     $('#append').click(function (e) {
         e.preventDefault();
+        $('#message').empty();
         item = $('#newItem').val();
-        quantity = $('#quantity').val();
-        $.post("/putShoppingList", { "it": item, "qu": quantity }, function (data) {
-            if (data == true) {
-                reloadList();
-            }else{
-                reloadList();
-                $('#message').html('Error while updating. Try again.');
-            }
-        });
+        quantity = parseInt($('#quantity').val());
+
+        if (item != '' && quantity != '' && /^\d*$/.test(quantity)) {
+            $.post("/putShoppingList", { "it": item, "qu": quantity }, function (data) {
+                if (data == true) {
+                    reloadList();
+                }else{
+                    reloadList();
+                    $('#message').html('Error while updating. Try again.');
+                }
+            });
+        }else{
+            $('#message').html('Please enter an item and a quantity (whole number) first.');
+        }
+
     });
 
 

@@ -94,3 +94,11 @@ footer{
 footer a{
     margin: 10px;
 }
+
+.description{
+    padding: 1em;
+}
+
+.description p{
+    font-style: italic;
+}
