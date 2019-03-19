@@ -202,10 +202,11 @@ app.get('/tasks', function (req, res) {
 
 app.get('/calendar', function (req, res) {
     if (req.session.username) {
-        res.render('dashboard_calendar', {
-            active: 3,
-            username: req.session.username
-        });
+        // res.render('dashboard_calendar', {
+        //     active: 3,
+        //     username: req.session.username
+        // });
+        res.sendFile(path.join(__dirname + '/private/calendar.html')); //for development purposes
     } else {
         res.status(403);
         res.redirect('/login.html');
@@ -322,6 +323,34 @@ app.get('/wipeAll', function (req, res) {
         res.redirect('/login.html');
     }
 });
+
+//for developer use only
+
+app.get('/getExampleUser', function (req, res) {
+    res.send(new User({
+        email: 'admin@horanize.com',
+        firstName: 'Admin',
+        lastName: 'Admin',
+        adress: '1 Admin Drive',
+        school: 'UOIT',
+        pswHashed: '',
+        room: '',
+        admin: true,
+        appointments: [
+            {
+                date: new Date(2019, 03, 20, 15, 00, 00, 00),
+                name: 'Haircut @ Hairworx'
+            },
+            {
+                date: new Date(2019, 03, 25, 10, 30, 00, 00),
+                name: 'Parents visiting'
+            }
+        ]
+
+    }));
+});
+
+//end of developer section
 
 
 
@@ -476,7 +505,11 @@ function initDB() {
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
         pswHashed: { type: String, require: true },
         room: String,
-        admin: Boolean
+        admin: Boolean,
+        appointments: [{
+            date: Date,
+            name: String
+        }]
     }, { collection: 'users' });
     User = mongoose.model('users', userSchema);
 
@@ -507,3 +540,4 @@ function initDB() {
     Room = mongoose.model('roomList', roomSchema);
 
 }
+
