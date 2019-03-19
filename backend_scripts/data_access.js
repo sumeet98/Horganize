@@ -167,3 +167,13 @@ exports.joinRoom = function (req, res, callback) {
         }
     });
 }
+
+exports.getProfile = function (req, res, callback) {
+    User.find({ email: req.session.username }).then(function (user) {
+        if (user.length > 0) {
+            callback(req, res, user);
+        }else{
+            callback(req, res, null);
+        }
+    });
+}

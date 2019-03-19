@@ -1,0 +1,29 @@
+extends dashboard_navigation
+
+block append scripts
+    script(src="scripts/dashboard_profile.js",type="text/javascript")
+
+block content
+    div(id="mainContent")
+        h3 Profile for #{username}
+        hr
+        div(id="actual")
+        hr
+        div(id="update")
+            form(id="updateForm")
+                div
+                    label Password*
+                    input(id="pswNew" name="pswNew")
+                div
+                    label Repeat Password*
+                    input(id="pswNewRepeat")
+                div
+                    label Adress
+                    input(id="adressNew" name="adressNew")
+        hr
+        div(id="leave")
+            button(id="leaveRoom" class="genButton") Leave current Room
+            button(id="deleteAccount" class="genButton") Delete Account
+        hr
+        div(id="message")
+

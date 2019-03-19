@@ -61,6 +61,30 @@ app.post('/register', function (req, res) {
     data_access.register(req, res, hashedPassword, registerDone);
 });
 
+app.get('/getProfile', function (req, res) {
+    data_access.getProfile(req, res, getProfileDone);
+});
+
+function getProfileDone(req, res, user) {
+    if (user.length > 0) {
+        cleanedUser = {
+            admin: user[0].admin,
+            adress: user[0].adress,
+            email: user[0].email,
+            firstName: user[0].firstName,
+            lastName: user[0].lastName,
+            room: user[0].room,
+            school: user[0].school
+        }
+        res.send(cleanedUser);
+    } else {
+        req.session.destroy(function (error) {
+            res.status(403);
+            res.redirect('/login.html');
+        });
+    }
+}
+
 app.post('/checkRoomExists/:roomName', function (req, res) {
     if (req.session.username) {
         data_access.roomExists(req, res, callbackBoolean)
@@ -192,6 +216,18 @@ app.get('/wallet', function (req, res) {
     if (req.session.username) {
         res.render('dashboard_wallet', {
             active: 4,
+            username: req.session.username
+        });
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/profile', function (req, res) {
+    if (req.session.username) {
+        res.render('dashboard_profile', {
+            active: 5,
             username: req.session.username
         });
     } else {

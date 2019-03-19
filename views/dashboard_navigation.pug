@@ -35,4 +35,10 @@ block navigation
             else
                 li
                     a(href="/wallet", class="link") Wallet
+            if active==5
+                li(class="active")
+                    a(href="/profile", class="link") Profile
+            else
+                li
+                    a(href="/profile", class="link") Profile
     block content
