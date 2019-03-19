@@ -34,44 +34,49 @@ $(document).ready(function () {
 function reloadList() {
     $('#shoppingList').html('');
     $.get("/getShoppingList", function (data) {
-        $.each(data[0].items, function (index, value) {
-            checked = '';
-            doneClass = '';
-            if (value.done) {
-                checked = 'checked';
-                doneClass = 'done';
-            }
-            $('#shoppingList').append('<tr>' +
-                '<td class="' + doneClass + '">' + value.name + '</td>' +
-                '<td class="' + doneClass + '">' + value.quantity + '</td>' +
-                '<td>' + '<input type="checkbox" id="' + index + '" value="' + value.name + '"' + checked + '> ' + '</td>' +
-                '</tr>');
-            $('#tableShopping').scrollTop($('#tableShopping')[0].scrollHeight);
-            $('#' + index).change(function () {
-                if (this.checked) {
-                    $(this).parent().siblings().addClass('done');
-                    $.post("/putShoppingListChecked", { "index": $(this).attr('id'), "checked": true }, function (data) {
-                        if (data == true) {
-                            reloadList();
-                        }else{
-                            reloadList();
-                            $('#message').html('Error while updating. Try again.');
-                        }
-                    });
+        if (data.length > 0) {
+            $.each(data[0].items, function (index, value) {
+                checked = '';
+                doneClass = '';
+                if (value.done) {
+                    checked = 'checked';
+                    doneClass = 'done';
                 }
-                else {
-                    $(this).parent().siblings().removeClass('done');
-                    $.post("/putShoppingListChecked", { "index": $(this).attr('id'), "checked": false }, function (data) {
-                        if (data == true) {
-                            reloadList();
-                        }else{
-                            reloadList();
-                            $('#message').html('Error while updating. Try again.');
-                        }
-                    });
-                }
+                $('#shoppingList').append('<tr>' +
+                    '<td class="' + doneClass + '">' + value.name + '</td>' +
+                    '<td class="' + doneClass + '">' + value.quantity + '</td>' +
+                    '<td>' + '<input type="checkbox" id="' + index + '" value="' + value.name + '"' + checked + '> ' + '</td>' +
+                    '</tr>');
+                $('#tableShopping').scrollTop($('#tableShopping')[0].scrollHeight);
+                $('#' + index).change(function () {
+                    if (this.checked) {
+                        $(this).parent().siblings().addClass('done');
+                        $.post("/putShoppingListChecked", { "index": $(this).attr('id'), "checked": true }, function (data) {
+                            if (data == true) {
+                                reloadList();
+                            }else{
+                                reloadList();
+                                $('#message').html('Error while updating. Try again.');
+                            }
+                        });
+                    }
+                    else {
+                        $(this).parent().siblings().removeClass('done');
+                        $.post("/putShoppingListChecked", { "index": $(this).attr('id'), "checked": false }, function (data) {
+                            if (data == true) {
+                                reloadList();
+                            }else{
+                                reloadList();
+                                $('#message').html('Error while updating. Try again.');
+                            }
+                        });
+                    }
+                });
             });
-        });
+            
+        } else {
+            
+        }
     });
 }
 

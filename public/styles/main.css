@@ -25,6 +25,11 @@ body{
     margin: 8px;
 }
 
+#loginContainer .genButton{
+    position: relative;
+    top: 30%;
+}
+
 input{
     font-family: 'Raleway', sans-serif;
     font-size: 16px;
@@ -50,7 +55,8 @@ input{
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    margin-top: 1.2em;
+    margin-right: 1em;
+    margin-left: 1em;
   }
 
 

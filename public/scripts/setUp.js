@@ -86,9 +86,11 @@ $(document).ready(function () {
                 if (found == 'true') {
                     $('#joinRoomInfo').html('Room found.');
                     $('#joinRoomButton').show();
+                    $('#roomPasswordJoinInfo').empty();
                 }else{
                     $('#joinRoomInfo').html('');
                     $('#joinRoomButton').hide();
+                    $('#roomPasswordJoinInfo').empty();
                 }
             }
         });
@@ -113,7 +115,7 @@ $(document).ready(function () {
                     window.location.replace('/dashboard');
                 }, 1000);
             } else {
-                $('#roomPasswordJoinInfo').html('Incorrect password.');
+                $('#roomPasswordJoinInfo').html('Incorrect secret / room.');
             }
         });
 

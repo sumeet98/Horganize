@@ -154,7 +154,7 @@ exports.wipeAll = function (req, res, callback) {
 }
 
 exports.joinRoom = function (req, res, callback) {
-    Room.find({ name: req.body.roomName }).then(function (room) {
+    Room.find({ name: req.body.roomName, secret: req.body.psw }).then(function (room) {
         if (room.length > 0) {
             User.find({ email: req.session.username }).then(function (user) {
                 user[0].room = req.body.roomName
@@ -163,7 +163,7 @@ exports.joinRoom = function (req, res, callback) {
                 })
             });
         } else {
-            callback(req, res, new Error('Room not found'));
+            callback(req, res, new Error('Room not found or secret wrong'));
         }
     });
 }
