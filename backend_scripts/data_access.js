@@ -152,3 +152,18 @@ exports.wipeAll = function (req, res, callback) {
         });
     });
 }
+
+exports.joinRoom = function (req, res, callback) {
+    Room.find({ name: req.body.roomName }).then(function (room) {
+        if (room.length > 0) {
+            User.find({ email: req.session.username }).then(function (user) {
+                user[0].room = req.body.roomName
+                user[0].save(function (error) {
+                    callback(req, res, error);
+                })
+            });
+        } else {
+            callback(req, res, new Error('Room not found'));
+        }
+    });
+}

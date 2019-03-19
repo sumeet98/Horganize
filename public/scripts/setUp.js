@@ -79,17 +79,11 @@ $(document).ready(function () {
     $('#roomNameJoin').keyup(function (e) {
         $.ajax({
             type: "post",
-            url: "/getRooms/:" + $('#roomNameJoin').val(),
+            url: "/checkRoomExists/" + $('#roomNameJoin').val(),
             data: "data",
-            dataType: "json",
-            success: function (response) {
-                var found = false;
-                for (let i = 0; i < response.rooms.length; i++) {
-                    if (response.rooms[i].name == $('#roomNameJoin').val()) {
-                        found = true;
-                    }
-                }
-                if (found) {
+            dataType: "text",
+            success: function (found) {
+                if (found == 'true') {
                     $('#joinRoomInfo').html('Room found.');
                     $('#joinRoomButton').show();
                 }else{

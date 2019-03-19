@@ -113,15 +113,24 @@ app.post('/joinRoom', function (req, res) {
     console.log(req.body.psw);
     console.log(req.session.username);
     if (req.session.username) {
-        if (joinRoom(req.body.roomName, req.body.psw, req.session.username)) {
-            res.send('true');
-        } else {
-            res.send('false');
-        }
+        // if (joinRoom(req.body.roomName, req.body.psw, req.session.username)) {
+        //     res.send('true');
+        // } else {
+        //     res.send('false');
+        // }
+        data_access.joinRoom(req, res, joinRoomDone)
     } else {
         res.sendStatus(403);
     }
 });
+
+function joinRoomDone(req, res, error) {
+    if (error) {
+        res.send('false');
+    } else {
+        res.send('true');
+    }
+}
 
 app.get('/logout', function (req, res) {
     if (req.session.username) {
@@ -328,13 +337,6 @@ function getRoomsFromDB(search) {
     };
 }
 
-function joinRoom(roomName, psw, username) {
-    if (roomName == 'test' && psw == 'test' && username == 'timo.buechert@uoit.net') {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 function getRoomMatesFromDB(email) {
     //implement DB check here
