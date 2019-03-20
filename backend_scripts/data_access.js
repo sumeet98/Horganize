@@ -183,18 +183,54 @@ exports.getProfile = function (req, res, callback) {
 }
 
 exports.deleteUser = function (req, res, callback) {
-    User.deleteOne({ email: req.session.username }, function (error) {
-        req.session.destroy(function (e) {
-            callback(req, res, error);
-        });
+
+    User.find({ email: req.session.username }).then(function (user) {
+        if (user.length > 0) {
+            leftRoom = user[0].room;
+
+            User.deleteOne({ email: req.session.username }, function (error, result) {
+                req.session.destroy(function (destroyError) {
+                    callback(req, res, error);
+                });
+                User.find({ room: leftRoom }).then(function (user) {
+                    if (user.length === 0) {
+                        Room.deleteOne({ name: leftRoom }, function(error, result) {
+                            if (result.deletedCount === 1) {
+                                console.log('Last user left from room: ' + leftRoom + '. Room deleted.');
+                            } else {
+                                console.log('Last user left from room: ' + leftRoom + '. Room could not be deleted');
+                            }
+                        });
+                    }
+                });
+            });
+        } else {
+            callback(req, res, new Error('User not found.'));
+        }
     });
+
+
+    
 }
 
 exports.leaveRoom = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
+            leftRoom = user[0].room;
             user[0].room = '';
             user[0].save(function (error) {
+
+                User.find({ room: leftRoom }).then(function (user) {
+                    if (user.length === 0) {
+                        Room.deleteOne({ name: leftRoom }, function(error, result) {
+                            if (error) {
+                                console.log('Last user left from room: ' + leftRoom + '. Room could not be deleted.');
+                            } else {
+                                console.log('Last user left from room: ' + leftRoom + '. Room deleted.');
+                            }
+                        });
+                    }
+                });
                 req.session.destroy(function (e) {
                     callback(req, res, error);
                 });

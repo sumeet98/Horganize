@@ -9,6 +9,7 @@ var bcrypt = require('bcrypt');
 var app = express();
 app.set('port', process.env.PORT || 3000);
 mongoose.connect('mongodb://localhost:27017/horganize', { useNewUrlParser: true });
+mongoose.set('useCreateIndex', true);
 initDB();
 
 app.use(session({
@@ -332,7 +333,7 @@ app.get('/deleteAccount', function (req, res) {
         res.status(404);
         res.redirect('/login');
 
-    } 
+    }
 });
 
 app.get('/deleteAccountEntry', function (req, res) {
@@ -342,7 +343,7 @@ app.get('/deleteAccountEntry', function (req, res) {
         res.status(404);
         res.redirect('/login');
 
-    } 
+    }
 });
 
 app.get('/leaveRoom', function (req, res) {
@@ -351,7 +352,7 @@ app.get('/leaveRoom', function (req, res) {
     } else {
         res.status(404);
         res.redirect('/login');
-    } 
+    }
 });
 
 app.post('/updateProfile', function (req, res) {
@@ -362,7 +363,7 @@ app.post('/updateProfile', function (req, res) {
     } else {
         res.status(404);
         res.redirect('/login');
-    } 
+    }
 });
 
 //for developer use only
@@ -495,6 +496,7 @@ function registerDone(req, res, error) {
 function performLogin(req, res, user) {
     if (user) {
         if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
+            console.log(user);
             if (user.room == '') {
                 req.session.username = req.body.emailLogin;
                 req.session.admin = user.admin;
@@ -509,15 +511,13 @@ function performLogin(req, res, user) {
             }
         } else {
             log(req.session.username + ' attempted login.');
-            res.render('landing_start', {
-                displayWarning: true,
+            res.render('landing_message', {
                 message: 'Username or password incorrect. Please try again. '
             })
         }
     } else {
         log(req.session.username + ' attempted login.');
-        res.render('landing_start', {
-            displayWarning: true,
+        res.render('landing_message', {
             message: 'Username or password incorrect. Please try again. '
         })
     }
@@ -553,6 +553,32 @@ function initDB() {
         }]
     }, { collection: 'users' });
     User = mongoose.model('users', userSchema);
+
+    User.deleteOne({ email: 'admin@horganize.com' }, function (error) {
+        if (error) {
+           log('Standard Admin could not be deleted: ' + error); 
+        } else {
+            log('Standard Admin deleted.');
+        }
+        new User({
+            email: 'admin@horganize.com',
+            firstName: 'ADMIN',
+            lastName: 'ADMIN',
+            adress: '',
+            school: 'UOIT',
+            pswHashed: bcrypt.hashSync('ADMIN', 8),
+            room: 'ADMIN',
+            admin: true
+        }).save(function (err) {
+            if (err) {
+                log('Standard Admin could not be recreated: ' + err);
+            } else {
+                log('Standard Admin recreated');
+            }
+        });
+
+    });
+
 
     shoppingSchema = new mongoose.Schema({
         room: {
