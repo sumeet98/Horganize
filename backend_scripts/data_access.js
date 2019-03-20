@@ -141,8 +141,8 @@ exports.addRoom = function (req, res, callback) {
 
 exports.wipeAll = function (req, res, callback) {
     User.deleteMany({}, function (errorUser) {
-        Room.deleteMany({}, function(errorRoom){
-            List.deleteMany({}, function(errorList){
+        Room.deleteMany({}, function (errorRoom) {
+            List.deleteMany({}, function (errorList) {
                 if (errorUser || errorRoom || errorList) {
                     callback(req, res, new Error('Wipe Error'));
                 } else {
@@ -157,13 +157,17 @@ exports.joinRoom = function (req, res, callback) {
     Room.find({ name: req.body.roomName, secret: req.body.psw }).then(function (room) {
         if (room.length > 0) {
             User.find({ email: req.session.username }).then(function (user) {
-                user[0].room = req.body.roomName
-                user[0].save(function (error) {
-                    callback(req, res, error);
-                })
+                if (user.length > 0) {
+                    user[0].room = req.body.roomName;
+                    user[0].save(function (error) {
+                        callback(req, res, error);
+                    });
+                } else {
+                    callback(req, res, new Error('User not found.'));
+                }
             });
         } else {
-            callback(req, res, new Error('Room not found or secret wrong'));
+            callback(req, res, new Error('Room not found or secret wrong.'));
         }
     });
 }
@@ -172,7 +176,7 @@ exports.getProfile = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
             callback(req, res, user);
-        }else{
+        } else {
             callback(req, res, null);
         }
     });
@@ -183,5 +187,34 @@ exports.deleteUser = function (req, res, callback) {
         req.session.destroy(function (e) {
             callback(req, res, error);
         });
+    });
+}
+
+exports.leaveRoom = function (req, res, callback) {
+    User.find({ email: req.session.username }).then(function (user) {
+        if (user.length > 0) {
+            user[0].room = '';
+            user[0].save(function (error) {
+                req.session.destroy(function (e) {
+                    callback(req, res, error);
+                });
+            });
+        } else {
+            callback(req, res, new Error('User not found.'));
+        }
+    });
+}
+
+exports.updateProfile = function (req, res, callback) {
+    User.find({ email: req.session.username }).then(function (user) {
+        if (user.length > 0) {
+            user[0].adress = req.body.adress;
+            user[0].pswHashed = req.body.psw;
+            user[0].save(function (error) {
+                callback(req, res, error);
+            });
+        } else {
+            callback(req, res, new Error('User not found.'));
+        }
     });
 }

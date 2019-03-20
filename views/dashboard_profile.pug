@@ -30,12 +30,14 @@ block content
             div
                 button(id="submit", class="genButton") Submit Changes
             div
-                button(id="leaveRoom", class="genButton", type="submit") Leave Room
+                
+                button(id="leaveRoom", class="genButton") Leave Room
             div
                 form(method="get", action="/deleteAccountEntry")
                     button(id="deleteAccount", class="genButton", type="submit") Delete Account
         hr
         div(id="message")
+            br
         div(class="description")
             p 
                 | "Administrate your profile on this page. Once you press the submit button,
@@ -43,4 +45,5 @@ block content
                 | Empty fields will be saved, too. Pressing the leave or delete button will cancel 
                 | your session, when successful. If you leave the room, HORGANIZE will take you through
                 | the setup again when you log in the next time. Leaving and deleting is irrevocable."
+        
 

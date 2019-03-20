@@ -303,6 +303,7 @@ app.post('/putShoppingListChecked', function (req, res) {
     data_access.addShoppingChecked(req, res, callbackBoolean);
 });
 
+
 function callbackBoolean(req, res, error) {
     if (error) {
         res.send(false);
@@ -342,7 +343,27 @@ app.get('/deleteAccountEntry', function (req, res) {
         res.redirect('/login');
 
     } 
-})
+});
+
+app.get('/leaveRoom', function (req, res) {
+    if (req.session.username) {
+        data_access.leaveRoom(req, res, callbackBoolean);
+    } else {
+        res.status(404);
+        res.redirect('/login');
+    } 
+});
+
+app.post('/updateProfile', function (req, res) {
+    if (req.session.username) {
+        psw = req.body.psw;
+        req.body.psw = bcrypt.hashSync(psw, 8);
+        data_access.updateProfile(req, res, callbackBoolean);
+    } else {
+        res.status(404);
+        res.redirect('/login');
+    } 
+});
 
 //for developer use only
 

@@ -48,7 +48,7 @@ $(document).ready(function () {
                 $('#secondPoint').removeClass('active');
                 setTimeout(function () {
                     window.location.replace('/dashboard');
-                }, 1000)
+                }, 1000);
             } else {
             }
         });
