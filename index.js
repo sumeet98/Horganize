@@ -324,6 +324,26 @@ app.get('/wipeAll', function (req, res) {
     }
 });
 
+app.get('/deleteAccount', function (req, res) {
+    if (req.session.username) {
+        data_access.deleteUser(req, res, callbackBoolean);
+    } else {
+        res.status(404);
+        res.redirect('/login');
+
+    } 
+});
+
+app.get('/deleteAccountEntry', function (req, res) {
+    if (req.session.username) {
+        res.sendFile(path.join(__dirname + '/private/delete.html'));
+    } else {
+        res.status(404);
+        res.redirect('/login');
+
+    } 
+})
+
 //for developer use only
 
 app.get('/getExampleUser', function (req, res) {

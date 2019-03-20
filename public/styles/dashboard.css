@@ -15,7 +15,7 @@ html{
     margin-left: 2.5vw;
     margin-right: 2.5vw;
     background-color: rgba(255, 255, 255, 0.9); 
-    min-height: 600px;  
+    min-height: 912px;  
 }
 
 
@@ -78,8 +78,20 @@ ul{
 
 .triple{
     display: grid;
-    grid-template-columns: 1fr 0.75fr auto;
-    margin: 0.75em;
+    grid-template-columns: 1fr 0.75fr 0.5fr;
+}
+
+.space{
+    margin: 8px;
+}
+
+.dual{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.entry{
+    margin: 4px;
 }
 
 .triple .genButton{

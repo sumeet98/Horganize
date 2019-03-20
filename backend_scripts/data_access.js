@@ -177,3 +177,11 @@ exports.getProfile = function (req, res, callback) {
         }
     });
 }
+
+exports.deleteUser = function (req, res, callback) {
+    User.deleteOne({ email: req.session.username }, function (error) {
+        req.session.destroy(function (e) {
+            callback(req, res, error);
+        });
+    });
+}

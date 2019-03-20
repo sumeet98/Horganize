@@ -7,23 +7,40 @@ block content
     div(id="mainContent")
         h3 Profile for #{username}
         hr
-        div(id="actual")
+        div(id="actual" class="dual")
         hr
         div(id="update")
-            form(id="updateForm")
+            form(id="updateForm" class="triple")
+                label(class="entry") Password
                 div
-                    label Password*
-                    input(id="pswNew" name="pswNew")
+                    input(class="entry", id="pswNew", name="pswNew", type="password")
+                span(id="pswMessage")
+                
+                label(class="entry") Repeat Password*
                 div
-                    label Repeat Password*
-                    input(id="pswNewRepeat")
+                    input(id="pswNewRepeat",class="entry", type="password")
+                span(id="pswRepMessage")
+                
+                label(class="entry") Adress
                 div
-                    label Adress
-                    input(id="adressNew" name="adressNew")
+                    input(id="adressNew", name="adressNew", class="entry")
+                span(id="adrMessage")
         hr
-        div(id="leave")
-            button(id="leaveRoom" class="genButton") Leave current Room
-            button(id="deleteAccount" class="genButton") Delete Account
+        div(id="buttons" class="triple")
+            div
+                button(id="submit", class="genButton") Submit Changes
+            div
+                button(id="leaveRoom", class="genButton", type="submit") Leave Room
+            div
+                form(method="get", action="/deleteAccountEntry")
+                    button(id="deleteAccount", class="genButton", type="submit") Delete Account
         hr
         div(id="message")
+        div(class="description")
+            p 
+                | "Administrate your profile on this page. Once you press the submit button,
+                | all data you entered will be saved. The passwords have to be identical.
+                | Empty fields will be saved, too. Pressing the leave or delete button will cancel 
+                | your session, when successful. If you leave the room, HORGANIZE will take you through
+                | the setup again when you log in the next time. Leaving and deleting is irrevocable."
 
