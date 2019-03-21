@@ -405,6 +405,10 @@ function getMessagesDone(req, res, messages) {
     res.send(messages);
 }
 
+app.post('/likeMessage', function (req, res) {
+   data_access.changeLike(req, res, callbackBoolean); 
+});
+
 //for developer use only
 
 app.get('/getExampleUser', function (req, res) {
@@ -575,7 +579,7 @@ function initDB() {
             name: String
         }]
     }, { collection: 'users' });
-    User = mongoose.model('users', userSchema);
+    User = mongoose.model('user', userSchema);
 
     User.deleteOne({ email: 'admin@horganize.com' }, function (error) {
         if (error) {
@@ -616,7 +620,16 @@ function initDB() {
             done: Boolean
         }]
     }, { collection: 'shoppingLists' });
-    List = mongoose.model('shoppingLists', shoppingSchema);
+    List = mongoose.model('shoppingList', shoppingSchema);
+    
+    messagesSchema = new mongoose.Schema({
+        user: String,
+        datetime: Date,
+        message: String,
+        email: String,
+        liked: [String]
+    },);
+    Message = mongoose.model('message', messagesSchema);
 
     roomSchema = new mongoose.Schema({
         name: {
@@ -625,10 +638,10 @@ function initDB() {
             unique: true,
             require: true
         },
-        messages: [],
+        messages: [messagesSchema],
         secret: { require: true, type: String }
-    }, { collection: 'roomList' });
-    Room = mongoose.model('roomList', roomSchema);
+    }, { collection: 'rooms' });
+    Room = mongoose.model('room', roomSchema);
 
 }
 

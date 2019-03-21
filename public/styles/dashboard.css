@@ -1,3 +1,41 @@
+/****************************************************
+* START OF INSERTION (FOREIGN CODE)
+*    Title: cssicon
+*    Author: Wenting Zhang
+*    Retrieved: 03/21/2019
+*    Availability: https://github.com/wentin/cssicon
+*    License: CC0 1.0 Universal
+*****************************************************/
+.icon, .icon:before, .icon:after, .icon i, .icon i:before, .icon i:after { 
+  transition: all 0.4s ease;
+  position: inherit;
+}
+/*END OF INSERTION (FOREIGN CODE)*/
+
+.anIcon{
+    width: 18px;
+    height: 18px;
+    float: right;
+    position: inherit;
+}
+
+.minus.icon{
+    position: inherit;
+}
+
+.heart-solid.icon{
+    position: inherit;
+}
+
+.filled{
+    background-color: #CEFF67;
+}
+
+.message{
+    border-radius: 10px;
+    transition: all 0.2s linear;
+}
+
 html{
     background: url('../images/background.jpg') no-repeat center center fixed;
     background-size: cover;
@@ -129,3 +167,4 @@ ul{
     max-height: 150px;
     overflow-y: scroll;
 }
+

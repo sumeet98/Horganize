@@ -132,6 +132,7 @@ exports.addRoom = function (req, res, callback) {
             User.find({ email: req.session.username }).then(function (user) {
                 user[0].room = req.params.roomName
                 user[0].save(function (error) {
+                    req.session.room = req.params.roomName;
                     callback(req, res, error);
                 })
             });
@@ -276,13 +277,13 @@ exports.getRoomMates = function (req, res, callback) {
 exports.appendMessage = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
-            Room.find({ name: req.session.room }).then( function (room) {
-                if (room.length > 0 ) {
-                    room[0].messages.push({ user: user[0].firstName, datetime: Date.now(), message: req.body.message });
+            Room.find({ name: req.session.room }).then(function (room) {
+                if (room.length > 0) {
+                    room[0].messages.push({ user: user[0].firstName, datetime: Date.now(), message: req.body.message, email: req.session.username, liked: [] });
                     room[0].save(function (error) {
                         callback(req, res, error);
                     });
-                }else{
+                } else {
                     callback(req, res, new Error('Room not found.'));
                 }
             });
@@ -293,13 +294,52 @@ exports.appendMessage = function (req, res, callback) {
 
 }
 
+exports.changeLike = function (req, res, callback) {
+
+    Room.find({ name: req.session.room }).then(function (room) {
+        if (room.length > 0) {
+
+            for (let i = 0; i < room[0].messages.length; i++) {
+                if (room[0].messages[i].email == req.body.username && room[0].messages[i].datetime.toISOString() == req.body.time) {
+
+                    for (let j = 0; j < room[0].messages[i].liked.length; j++) {
+                        if (room[0].messages[i].liked[j] == req.session.username) {
+                            room[0].messages[i].liked.splice(j, 1);
+                        }
+                    }
+                    if (req.body.like == 'true') {
+                        room[0].messages[i].liked.push(req.session.username);
+                    } 
+                    room[0].save(function (error) {
+                        callback(req, res, error);
+                    });
+                    console.log(room[0].messages[i]);
+                }
+            }
+        } else {
+            callback(req, res, new Error('Room not found.'));
+        }
+    });
+
+
+}
 exports.getMessages = function (req, res, callback) {
     Room.find({ name: req.session.room }).then(function (room) {
-        if (room.length > 0 ) {
+        if (room.length > 0) {
+
+            //remove all other users who liked this announcement, to give the user only the information he needs (wheter he liked it or not)
+            for (let i = 0; i < room[0].messages.length; i++) {
+                for (let j = 0; j < room[0].messages[i].liked.length; j++) {
+                    if (room[0].messages[i].liked[j] == req.session.username) {
+                    } else {
+                        room[0].messages[i].liked.splice(j, 1);
+                    }
+                }
+            }
             console.log(JSON.stringify(room[0].messages));
             callback(req, res, room[0].messages);
-        }else{
+        } else {
             callback(req, res, null);
-        }  
+        }
     });
 }
