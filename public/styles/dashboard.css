@@ -85,6 +85,10 @@ ul{
     margin: 8px;
 }
 
+.spaceIn{
+    padding: 8px;
+}
+
 .dual{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -110,4 +114,18 @@ ul{
 
 #quantity{
     width: 100px;
+}
+
+.box{
+    border-style: solid;
+    border-color: black;
+    background-color: white;
+    border-radius: 10px;
+    border-width: thin;
+}
+
+#messages{
+    min-height: 150px;
+    max-height: 150px;
+    overflow-y: scroll;
 }

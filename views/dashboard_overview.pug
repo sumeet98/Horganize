@@ -7,8 +7,18 @@ block content
     div(id="mainContent")
         h3 Welcome #{username}
         hr
-        p You share your room with 
-        ul(id="roomMates")
+        h4 Room Announcements:
+        div(class="dual")
+            div(class="box spaceIn space")
+                div(id="messages" class="spaceIn")
+                div(id="inputContainer")
+                    label Message: 
+                    input(id="messageInput")
+            div(class="box spaceIn space")
+                p The following people are in your room #{room}:
+                ul(id="roomMates")
+            
+
         
             
 

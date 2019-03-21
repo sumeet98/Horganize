@@ -160,6 +160,7 @@ exports.joinRoom = function (req, res, callback) {
                 if (user.length > 0) {
                     user[0].room = req.body.roomName;
                     user[0].save(function (error) {
+                        req.session.room = req.body.roomName;
                         callback(req, res, error);
                     });
                 } else {
@@ -194,7 +195,7 @@ exports.deleteUser = function (req, res, callback) {
                 });
                 User.find({ room: leftRoom }).then(function (user) {
                     if (user.length === 0) {
-                        Room.deleteOne({ name: leftRoom }, function(error, result) {
+                        Room.deleteOne({ name: leftRoom }, function (error, result) {
                             if (result.deletedCount === 1) {
                                 console.log('Last user left from room: ' + leftRoom + '. Room deleted.');
                             } else {
@@ -210,7 +211,7 @@ exports.deleteUser = function (req, res, callback) {
     });
 
 
-    
+
 }
 
 exports.leaveRoom = function (req, res, callback) {
@@ -222,7 +223,7 @@ exports.leaveRoom = function (req, res, callback) {
 
                 User.find({ room: leftRoom }).then(function (user) {
                     if (user.length === 0) {
-                        Room.deleteOne({ name: leftRoom }, function(error, result) {
+                        Room.deleteOne({ name: leftRoom }, function (error, result) {
                             if (error) {
                                 console.log('Last user left from room: ' + leftRoom + '. Room could not be deleted.');
                             } else {
@@ -252,5 +253,53 @@ exports.updateProfile = function (req, res, callback) {
         } else {
             callback(req, res, new Error('User not found.'));
         }
+    });
+}
+
+exports.getRoomMates = function (req, res, callback) {
+    User.find({ email: req.session.username }).then(function (user) {
+        if (user.length > 0) {
+            User.find({ room: user[0].room }).then(function (user) {
+                if (user.length > 0) {
+                    callback(req, res, user);
+                } else {
+                    callback(req, res, null);
+                }
+            });
+
+        } else {
+            callback(req, res, null);
+        }
+    });
+}
+
+exports.appendMessage = function (req, res, callback) {
+    User.find({ email: req.session.username }).then(function (user) {
+        if (user.length > 0) {
+            Room.find({ name: req.session.room }).then( function (room) {
+                if (room.length > 0 ) {
+                    room[0].messages.push({ user: user[0].firstName, datetime: Date.now(), message: req.body.message });
+                    room[0].save(function (error) {
+                        callback(req, res, error);
+                    });
+                }else{
+                    callback(req, res, new Error('Room not found.'));
+                }
+            });
+        } else {
+            callback(req, res, new Error('User not found.'));
+        }
+    });
+
+}
+
+exports.getMessages = function (req, res, callback) {
+    Room.find({ name: req.session.room }).then(function (room) {
+        if (room.length > 0 ) {
+            console.log(JSON.stringify(room[0].messages));
+            callback(req, res, room[0].messages);
+        }else{
+            callback(req, res, null);
+        }  
     });
 }

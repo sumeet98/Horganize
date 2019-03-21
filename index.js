@@ -41,7 +41,8 @@ app.get('/dashboard', function (req, res) {
     if (req.session.username && roomAlreadyRegistered(req.session.username)) { //check if room registered!!
         res.render('dashboard_overview', {
             active: 0,
-            username: req.session.username
+            username: req.session.username,
+            room: req.session.room
         });
     } else {
         res.redirect('/login.html');
@@ -143,7 +144,7 @@ app.post('/joinRoom', function (req, res) {
         // } else {
         //     res.send('false');
         // }
-        data_access.joinRoom(req, res, joinRoomDone)
+        data_access.joinRoom(req, res, joinRoomDone);
     } else {
         res.sendStatus(403);
     }
@@ -240,13 +241,26 @@ app.get('/profile', function (req, res) {
 
 app.post('/roommates', function (req, res) {
     if (req.session.username) {
-        res.send(getRoomMatesFromDB(req.session.username))
+        data_access.getRoomMates(req, res, getRoomMatesDone);
     } else {
         res.status(403);
         res.redirect('/login.html');
     }
 });
 
+function getRoomMatesDone(req, res, users) {
+    mates = [];
+    for (let i = 0; i < users.length; i++) {
+        mates[i] = {
+            
+            "firstName": users[i].firstName,
+            "lastName": users[i].lastName,
+            "email": users[i].email,
+            "school": users[i].school
+        };
+    }
+    res.send(mates);
+}
 app.get('/getShoppingList', function (req, res) {
     let tempShoppingList = {
         "items": [{
@@ -307,8 +321,10 @@ app.post('/putShoppingListChecked', function (req, res) {
 
 function callbackBoolean(req, res, error) {
     if (error) {
+        res.status(500);
         res.send(false);
     } else {
+        res.status(200);
         res.send(true);
     }
 }
@@ -365,6 +381,29 @@ app.post('/updateProfile', function (req, res) {
         res.redirect('/login');
     }
 });
+
+app.post('/appendMessage', function (req, res) {
+    if (req.session.username) {
+        data_access.appendMessage(req, res, callbackBoolean);
+    } else {
+        res.status(404);
+        res.redirect('/login');
+    }
+});
+
+app.get('/getMessages', function (req, res) {
+    if (req.session.username) {
+        data_access.getMessages(req, res, getMessagesDone);
+    } else {
+        res.status(404);
+        res.redirect('/login');
+    }
+});
+
+
+function getMessagesDone(req, res, messages) {
+    res.send(messages);
+}
 
 //for developer use only
 
@@ -445,22 +484,6 @@ function getRoomsFromDB(search) {
 }
 
 
-function getRoomMatesFromDB(email) {
-    //implement DB check here
-    return {
-        "mates": [{
-            "firstName": "Timo",
-            "lastName": "Buechert",
-            "email": "timo.buechert@uoit.net",
-            "school": "UOIT"
-        }, {
-            "firstName": "Max",
-            "lastName": "Miller",
-            "email": "max.miller@durhamcollege.net",
-            "school": "Durham College"
-        }]
-    };
-}
 
 
 function registerDone(req, res, error) {
@@ -602,6 +625,7 @@ function initDB() {
             unique: true,
             require: true
         },
+        messages: [],
         secret: { require: true, type: String }
     }, { collection: 'roomList' });
     Room = mongoose.model('roomList', roomSchema);

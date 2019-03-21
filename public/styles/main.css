@@ -102,3 +102,7 @@ footer a{
 .description p{
     font-style: italic;
 }
+
+.lightLine{
+    border: 01px solid lightgray;
+}
