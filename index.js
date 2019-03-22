@@ -1,16 +1,20 @@
 var express = require('express');
 var bodyParser = require('body-parser');
-var uuid = require('uuid');
+var uuid = require('uuid/v4');
 var session = require('express-session');
 var path = require('path');
 var mongoose = require('mongoose');
 var data_access = require('./backend_scripts/data_access')
 var bcrypt = require('bcrypt');
+var nodemailer = require('nodemailer');
+var nanoid = require("nanoid");
 var app = express();
 app.set('port', process.env.PORT || 3000);
 mongoose.connect('mongodb://localhost:27017/horganize', { useNewUrlParser: true });
 mongoose.set('useCreateIndex', true);
 initDB();
+var transporter = null;
+initMailer();
 
 app.use(session({
     secret: 'Z5vyQoTAeS',
@@ -139,11 +143,6 @@ app.post('/joinRoom', function (req, res) {
     console.log(req.body.psw);
     console.log(req.session.username);
     if (req.session.username) {
-        // if (joinRoom(req.body.roomName, req.body.psw, req.session.username)) {
-        //     res.send('true');
-        // } else {
-        //     res.send('false');
-        // }
         data_access.joinRoom(req, res, joinRoomDone);
     } else {
         res.sendStatus(403);
@@ -204,10 +203,6 @@ app.get('/tasks', function (req, res) {
 
 app.get('/calendar', function (req, res) {
     if (req.session.username) {
-        // res.render('dashboard_calendar', {
-        //     active: 3,
-        //     username: req.session.username
-        // });
         res.sendFile(path.join(__dirname + '/private/calendar.html')); //for development purposes
     } else {
         res.status(403);
@@ -252,7 +247,7 @@ function getRoomMatesDone(req, res, users) {
     mates = [];
     for (let i = 0; i < users.length; i++) {
         mates[i] = {
-            
+
             "firstName": users[i].firstName,
             "lastName": users[i].lastName,
             "email": users[i].email,
@@ -262,22 +257,6 @@ function getRoomMatesDone(req, res, users) {
     res.send(mates);
 }
 app.get('/getShoppingList', function (req, res) {
-    let tempShoppingList = {
-        "items": [{
-            "name": "Milk 1l",
-            "quantity": "2",
-            "done": false
-        }, {
-            "name": "Bin Bags BigPack",
-            "quantity": "1",
-            "done": false
-        }, {
-            "name": "Apples",
-            "quantity": "8",
-            "done": true
-        }]
-    };
-
     if (req.session.username) {
         data_access.getShoppingList(req, res, getShoppingListDone);
     } else {
@@ -406,8 +385,51 @@ function getMessagesDone(req, res, messages) {
 }
 
 app.post('/likeMessage', function (req, res) {
-   data_access.changeLike(req, res, callbackBoolean); 
+    data_access.changeLike(req, res, callbackBoolean);
 });
+
+app.get('/passwordForgot', function (req, res) {
+    res.render('landing_password');
+});
+
+app.post('/resetPassword', function (req, res) {
+    if (req.body.email) {
+        req.body.token = nanoid();
+        req.body.resetTokExp = Date.now() + 3600000; 
+        data_access.createPswTok(req, res, resetPasswordSent);
+    } else {
+        res.render('landing_message',{
+            message: 'There was no email entered.'
+        });
+    }
+});
+
+function resetPasswordSent(req, res, error, token) {
+    if (error) {
+        res.render('landing_message',{
+            message: 'Error while sending password reset email.'
+        });
+    } else {
+        transporter.sendMail({
+            to: req.body.email,
+            subject: 'Horganize Password Reset',
+            text:   'Hi there!\n' + 
+                    'please click on the following link to reset your password: \n' + 
+                    'http://localhost:3000/resetTok/' + token
+        }, function (error, info) {
+            if (error) {
+                res.render('landing_message',{
+                    message: 'Error while sending password reset email.'
+                });
+            } else {
+                res.render('landing_message',{
+                    message: 'Password reset email sent! Have a look at your inbox.'
+                });
+            }
+        });
+
+    }
+}
 
 //for developer use only
 
@@ -574,6 +596,8 @@ function initDB() {
         pswHashed: { type: String, require: true },
         room: String,
         admin: Boolean,
+        resetTok: String,
+        resetTokExp: Date,
         appointments: [{
             date: Date,
             name: String
@@ -583,7 +607,7 @@ function initDB() {
 
     User.deleteOne({ email: 'admin@horganize.com' }, function (error) {
         if (error) {
-           log('Standard Admin could not be deleted: ' + error); 
+            log('Standard Admin could not be deleted: ' + error);
         } else {
             log('Standard Admin deleted.');
         }
@@ -595,7 +619,9 @@ function initDB() {
             school: 'UOIT',
             pswHashed: bcrypt.hashSync('ADMIN', 8),
             room: 'ADMIN',
-            admin: true
+            admin: true,
+            resetTok: '',
+            resetTokExp: ''
         }).save(function (err) {
             if (err) {
                 log('Standard Admin could not be recreated: ' + err);
@@ -621,14 +647,14 @@ function initDB() {
         }]
     }, { collection: 'shoppingLists' });
     List = mongoose.model('shoppingList', shoppingSchema);
-    
+
     messagesSchema = new mongoose.Schema({
         user: String,
         datetime: Date,
         message: String,
         email: String,
         liked: [String]
-    },);
+    });
     Message = mongoose.model('message', messagesSchema);
 
     roomSchema = new mongoose.Schema({
@@ -643,5 +669,27 @@ function initDB() {
     }, { collection: 'rooms' });
     Room = mongoose.model('room', roomSchema);
 
+}
+
+function initMailer() {
+    transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: "mailhorganize@gmail.com",
+            pass: "horganizem19"
+        }
+    }, 
+    {   from: "mailhorganize@gmail.com"
+    });
+
+    transporter.verify(function (error) {
+        if (error) {
+            log('Connection to email server ended up with error: ' + error);
+        } else {
+            log('Connection to email server verified.')
+        }
+    })
 }
 

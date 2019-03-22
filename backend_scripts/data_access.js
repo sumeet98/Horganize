@@ -343,3 +343,13 @@ exports.getMessages = function (req, res, callback) {
         }
     });
 }
+
+exports.createPswTok = function (req, res, callback) {
+    User.findOneAndUpdate({email: req.body.email}, { $set: { resetTok: req.body.token, resetTokExp: req.body.resetTokExp} }, function (error, result) {
+        if (error) {
+            callback(req, res, error, req.body.token);
+        } else {
+            callback(req, res, null, req.body.token);
+        }
+    });
+}
