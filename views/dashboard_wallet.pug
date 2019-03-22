@@ -1,5 +1,43 @@
 extends dashboard_navigation
 
+block append scripts
+    script(src="scripts/dashboard_wallet.js",type="text/javascript")
+
 block content
     div(id="mainContent")
-        h3 Welcome #{username}
+        h3 Wallet for:  #{username}
+        hr
+        h4 Expenditures and debts: 
+        div(class="dual")
+            div
+                h4 Expenditures:
+                div(class="box spaceIn space")
+            div    
+                h4 Debts:
+                div(class="box spaceIn space")
+        div(class="input triple space")
+            div
+                span Price: 
+                input(id="price")
+            div
+                span For what: 
+                input(id="what")
+                 
+            div 
+                button(class="genButton" id="append") Append
+        div(class="input space")
+            span For who: 
+            input(id="who" type="hidden")
+            ul(id="users" class="inline")
+                    
+
+
+
+
+        hr
+        div(class="description")
+            p 
+                | "On this page you can easily manage your expenses for you and your roommates.
+                | Just add the price and a description and choose who you want to share this expense with. 
+                | HORGANIZE will automatically calculate the portion for everybody and display it.
+                | If you want to remove an item, simply click on it and choose remove."

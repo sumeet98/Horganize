@@ -42,7 +42,7 @@ app.post('/login', function (request, response) {
 });
 
 app.get('/dashboard', function (req, res) {
-    if (req.session.username && roomAlreadyRegistered(req.session.username)) { //check if room registered!!
+    if (req.session.username && req.session.room) { //check if room registered!!
         res.render('dashboard_overview', {
             active: 0,
             username: req.session.username,
@@ -177,7 +177,7 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/shopping', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         res.render('dashboard_shopping', {
             active: 1,
             roomName: req.session.room,
@@ -190,7 +190,7 @@ app.get('/shopping', function (req, res) {
 });
 
 app.get('/tasks', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         res.render('dashboard_tasks', {
             active: 2,
             username: req.session.username
@@ -202,7 +202,7 @@ app.get('/tasks', function (req, res) {
 });
 
 app.get('/calendar', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         res.sendFile(path.join(__dirname + '/private/calendar.html')); //for development purposes
     } else {
         res.status(403);
@@ -211,7 +211,7 @@ app.get('/calendar', function (req, res) {
 });
 
 app.get('/wallet', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         res.render('dashboard_wallet', {
             active: 4,
             username: req.session.username
@@ -223,7 +223,7 @@ app.get('/wallet', function (req, res) {
 });
 
 app.get('/profile', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         res.render('dashboard_profile', {
             active: 5,
             username: req.session.username
@@ -235,7 +235,7 @@ app.get('/profile', function (req, res) {
 });
 
 app.post('/roommates', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         data_access.getRoomMates(req, res, getRoomMatesDone);
     } else {
         res.status(403);
@@ -257,7 +257,7 @@ function getRoomMatesDone(req, res, users) {
     res.send(mates);
 }
 app.get('/getShoppingList', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username  && req.session.room) {
         data_access.getShoppingList(req, res, getShoppingListDone);
     } else {
         res.status(403);
@@ -266,7 +266,7 @@ app.get('/getShoppingList', function (req, res) {
 });
 
 app.get('/admin', function (req, res) {
-    if (req.session.username && req.session.admin) {
+    if (req.session.username && req.session.admin  && req.session.room) {
         res.render('dashboard_admin', {
             username: req.session.username
         });
@@ -342,7 +342,7 @@ app.get('/deleteAccountEntry', function (req, res) {
 });
 
 app.get('/leaveRoom', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username ) {
         data_access.leaveRoom(req, res, callbackBoolean);
     } else {
         res.status(404);
@@ -511,12 +511,6 @@ app.use(function (err, req, res, next) {
         message: 'Sorry, an internal error occured.'
     });
 });
-
-function roomAlreadyRegistered(email) {
-    return true; //implement db check here later
-}
-
-
 
 function registerRoom(roomName, userName) {
     //implement db check here

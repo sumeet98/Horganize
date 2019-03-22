@@ -119,6 +119,11 @@ ul{
     grid-template-columns: 1fr 0.75fr 0.5fr;
 }
 
+.quatro{
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr 1fr 0.5fr;
+}
+
 .space{
     margin: 8px;
 }
@@ -166,5 +171,14 @@ ul{
     min-height: 150px;
     max-height: 150px;
     overflow-y: scroll;
+}
+
+.inline{
+    list-style-type: none;
+    display: inline-block;
+}
+
+.inline li{
+    display: inline;
 }
 
