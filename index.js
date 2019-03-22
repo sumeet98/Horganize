@@ -413,13 +413,16 @@ function resetPasswordSent(req, res, error, token) {
         transporter.sendMail({
             to: req.body.email,
             subject: 'Horganize Password Reset',
-            text:   'Hi there!\n' + 
+            text:   'Hi there!\n\n' + 
                     'please click on the following link to reset your password: \n' + 
-                    'http://localhost:3000/resetTok/' + token
+                    'http://localhost:3000/' + token + ' \n' + 
+                    'This link will automatically log you in and redirect you to the profile page, where you can set your new password. '+
+                    'If your profile is not assigned to a room, you have to complete the setup first. \n\n' + 
+                    'Thanks for using HORGANIZE!'
         }, function (error, info) {
             if (error) {
                 res.render('landing_message',{
-                    message: 'Error while sending password reset email.'
+                    message: 'Could not send password reset email.'
                 });
             } else {
                 res.render('landing_message',{
@@ -428,6 +431,36 @@ function resetPasswordSent(req, res, error, token) {
             }
         });
 
+    }
+}
+
+app.get('/:token', function (req, res) {
+    if (req.params.token) {
+        data_access.checkToken(req, res, resetPasswordComplete);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+});
+
+function resetPasswordComplete(req, res, error, user) {
+    if (error) {
+        res.render('landing_message',{
+            message: 'This link is not valid.'
+        });
+    } else {
+        if (user.room == '') {
+            req.session.username = user.email;
+            req.session.admin = user.admin;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/setup');
+        } else {
+            req.session.username = user.email;
+            req.session.room = user.room;
+            req.session.admin = user.admin;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/profile');
+        }
     }
 }
 

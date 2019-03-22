@@ -346,10 +346,25 @@ exports.getMessages = function (req, res, callback) {
 
 exports.createPswTok = function (req, res, callback) {
     User.findOneAndUpdate({email: req.body.email}, { $set: { resetTok: req.body.token, resetTokExp: req.body.resetTokExp} }, function (error, result) {
-        if (error) {
-            callback(req, res, error, req.body.token);
+        
+        if (error || !result) {
+            callback(req, res, new Error('User not found'), req.body.token);
         } else {
             callback(req, res, null, req.body.token);
+        }
+    });
+}
+
+exports.checkToken = function (req, res, callback) {
+    User.findOne({resetTok: req.params.token}, function(error, user){
+        if (!user) {
+            callback(req, res, new Error('Token not found'), null);
+        } else {
+            if (user.resetTokExp > Date.now()) {
+                callback(req, res, null, user);
+            } else {
+                callback(req, res, new Error('Token expired'), user);
+            }
         }
     });
 }
