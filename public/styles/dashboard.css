@@ -41,19 +41,26 @@ html{
     background-size: cover;
 }
 
+body{
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
 .dashboardContainer{
     border-style: solid;
     border-radius: 15px;
     border-color: white;
     border-width: thin;
-    width: 95vw;
-    height: 95vh;
     margin-top: 2.0vh;
     margin-bottom: 2.0vh;
     margin-left: 2.5vw;
     margin-right: 2.5vw;
     background-color: rgba(255, 255, 255, 0.9); 
     min-height: 912px;  
+    min-width: 1000px;
+    max-width: 1000px;
+    position: relative;
 }
 
 
@@ -116,7 +123,7 @@ ul{
 
 .triple{
     display: grid;
-    grid-template-columns: 1fr 0.75fr 0.5fr;
+    grid-template-columns: 1fr 1fr 0.5fr;
 }
 
 .quatro{
@@ -182,3 +189,8 @@ ul{
     display: inline;
 }
 
+.overflow{
+    min-height: 150px;
+    max-height: 150px;
+    overflow-y: scroll;
+}

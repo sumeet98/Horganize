@@ -1,6 +1,6 @@
 .container{
     display: grid;
-    grid-template-columns: 90vw;
+    grid-template-columns: 1fr;
     justify-content: center;
     justify-items: center;
 }
@@ -8,18 +8,18 @@ h1{
     text-align: center;
     margin-top: 25vh;
     margin-bottom: 7.5vw;
-    font-size: 4vw;
+    font-size: 64pt;
 }
 
 .bigButton{
-    font-size: 2vw;
-    width: 25vw;
+    font-size: 24pt;
+    width: 300px;
     margin-top: 4vw;
 }
 
 .setUpRow{
     display: grid;
-    grid-template-columns: 40vw 40vw;
+    grid-template-columns: 1fr 1fr;
     grid-column-gap: 5vw;
     justify-content: center;
     justify-items: center;
@@ -31,29 +31,30 @@ h1{
 
 .roomForm{
     display: grid;
-    grid-template-columns: 40vw 40vw;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 50px;
     justify-content: center;
     justify-items: center;
 }
 
 .roomForm input{
-    font-size: 2vw;
+    font-size: 24pt;
     color: grey;
 }
 
 #joinExisting input{
-    font-size: 2vw;
+    font-size: 24pt;
     color: grey;
 }
 
 .point{
     background-color: white;
     border-radius: 50%;
-    width: 1vw;
-    height: 1vw;
+    width: 18px;
+    height: 18px;
     display: inline-block;
     border-color: grey;
-    margin: 0.2vh;
+    margin: 8px;
 }
 
 .active{
@@ -62,7 +63,9 @@ h1{
 
 .progress{
     position: absolute;
-    bottom: 3.5vh;
+    bottom: 20px;
+    right: 0;
+    left: 0;
 
 }
 
