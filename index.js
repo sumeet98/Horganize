@@ -434,6 +434,44 @@ function resetPasswordSent(req, res, error, token) {
     }
 }
 
+//for developer use only
+
+app.get('/getExampleUser', function (req, res) {
+
+    appointment1= new Appointment({
+        start: new Date(2019, 03, 23, 10, 0, 0, 0),
+        end: new Date(2019, 03, 23, 11, 30, 0, 0),
+        name: 'Hair Appointment @Hairworx',
+        allDay: false
+    });
+
+    appointment2= new Appointment({
+        start: new Date(2019, 03, 27, 16, 0, 0, 0),
+        end: new Date(2019, 03, 27, 16, 30, 0, 0),
+        name: 'Pay Fees',
+        allDay: false
+    });
+
+    res.send(new User({
+        email: 'admin@horanize.com',
+        firstName: 'Admin',
+        lastName: 'Admin',
+        adress: '1 Admin Drive',
+        school: 'UOIT',
+        pswHashed: '',
+        room: '',
+        admin: true,
+        resetTok: '',
+        resetTokExp: '',
+        appointments: [
+            appointment1, appointment2
+        ]
+
+    }));
+});
+
+//end of developer section
+
 app.get('/:token', function (req, res) {
     if (req.params.token) {
         data_access.checkToken(req, res, resetPasswordComplete);
@@ -463,36 +501,6 @@ function resetPasswordComplete(req, res, error, user) {
         }
     }
 }
-
-//for developer use only
-
-app.get('/getExampleUser', function (req, res) {
-    res.send(new User({
-        email: 'admin@horanize.com',
-        firstName: 'Admin',
-        lastName: 'Admin',
-        adress: '1 Admin Drive',
-        school: 'UOIT',
-        pswHashed: '',
-        room: '',
-        admin: true,
-        appointments: [
-            {
-                date: new Date(2019, 03, 20, 15, 00, 00, 00),
-                name: 'Haircut @ Hairworx'
-            },
-            {
-                date: new Date(2019, 03, 25, 10, 30, 00, 00),
-                name: 'Parents visiting'
-            }
-        ]
-
-    }));
-});
-
-//end of developer section
-
-
 
 app.listen(app.get('port'), function () {
     log('Server started up and is now listening on port:' + app.get('port'));
@@ -608,6 +616,15 @@ function initDB() {
 
     //init Schmemas
 
+    appointmentSchema = new mongoose.Schema({
+        start: Date,
+        end: Date,
+        name: String,
+        allDay: Boolean
+    });
+
+    Appointment = mongoose.model('appointment', appointmentSchema);
+
     userSchema = new mongoose.Schema({
         email: {
             type: String,
@@ -625,12 +642,11 @@ function initDB() {
         admin: Boolean,
         resetTok: String,
         resetTokExp: Date,
-        appointments: [{
-            date: Date,
-            name: String
-        }]
+        appointments: [appointmentSchema]
     }, { collection: 'users' });
     User = mongoose.model('user', userSchema);
+
+    
 
     User.deleteOne({ email: 'admin@horganize.com' }, function (error) {
         if (error) {
