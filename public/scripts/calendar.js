@@ -1,113 +1,51 @@
-//code from calendar from stackoverflow: https://stackoverflow.com/questions/43316726/build-a-calendar-using-javascript-jquery
-
-var CURRENT_DATE = new Date();
-var d = new Date();
-
-var content = 'January February March April May June July August September October November December'.split(' ');
-var weekDayName = 'SUN MON TUES WED THURS FRI'.split(' ');
-var daysOfMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-// Returns the day of week which month starts (eg 0 for Sunday, 1 for Monday, etc.)
-function getCalendarStart(dayOfWeek, currentDate) {
-  var date = currentDate - 1;
-  var startOffset = (date % 7) - dayOfWeek;
-  if (startOffset > 0) {
-    startOffset -= 7;
-  }
-  return Math.abs(startOffset);
-}
-
-// Render Calendar
-function renderCalendar(startDay, totalDays, currentDate) {
-  var currentRow = 1;
-  var currentDay = startDay;
-  var $table = $('table');
-  var $week = getCalendarRow();
-  var $day;
-  var i = 1;
-
-  for (; i <= totalDays; i++) {
-    $day = $week.find('td').eq(currentDay);
-    $day.text(i);
-    if (i === currentDate) {
-      $day.addClass('today');
-    }
-
-    // +1 next day until Saturday (6), then reset to Sunday (0)
-    currentDay = ++currentDay % 7;
-
-    // Generate new row when day is Saturday, but only if there are
-    // additional days to render
-    if (currentDay === 0 && (i + 1 <= totalDays)) {
-      $week = getCalendarRow();
-      currentRow++;
-    }
-  }
-}
-
-// Clear generated calendar
-function clearCalendar() {
-  var $trs = $('tr').not(':eq(0)');
-  $trs.remove();
-  $('.month-year').empty();
-}
-
-// Generates table row used when rendering Calendar
-function getCalendarRow() {
-  var $table = $('table');
-  var $tr = $('<tr/>');
-  for (var i = 0, len = 7; i < len; i++) {
-    $tr.append($('<td/>'));
-  }
-  $table.append($tr);
-  return $tr;
-}
-
-function myCalendar() {
-  var month = d.getMonth();
-  var day = d.getDay();
-  var year = d.getFullYear();
-  var date = d.getDate();
-  var totalDaysOfMonth = daysOfMonth[month];
-  var counter = 1;
-
-  var $h3 = $('<h3>');
-
-  $h3.text(content[month] + ' ' + year);
-  $h3.appendTo('.month-year');
-
-  var dateToHighlight = 0;
-
-  // Determine if Month && Year are current for Date Highlight
-  if (CURRENT_DATE.getMonth() === month && CURRENT_DATE.getFullYear() === year) {
-    dateToHighlight = date;
-  }
-
-  //Getting February Days Including The Leap Year
-  if (month === 1) {
-    if ((year % 100 !== 0) && (year % 4 === 0) || (year % 400 === 0)) {
-      totalDaysOfMonth = 29;
-    }
-  }
-
-  // Get Start Day
-  renderCalendar(getCalendarStart(day, date), totalDaysOfMonth, dateToHighlight);
-};
-
-function navigationHandler(dir) {
-  d.setMonth(d.getMonth() + dir);
-  clearCalendar();
-  myCalendar();
-}
-
 $(document).ready(function() {
-  // Bind Events
-  $('.prev-month').click(function() {
-    navigationHandler(-1);
-  });
-  $('.next-month').click(function() {
-    navigationHandler(1);
-  });
-  // Generate Calendar
-  myCalendar();
+  var $calendar = $('#calendar').fullCalendar({
+      header: {
+        left: 'prev,next',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      selectable: true,
+      editable: true,
+      select: function(start, end, jsEvent, view) {
+           var title = prompt("Enter a title for this event", "New event");
+
+           if (title) {
+             var event = {
+               title: title,
+               start: start,
+               end: end,
+             };
+
+             $calendar.fullCalendar("renderEvent", event, false);
+           };
+           $calendar.fullCalendar("unselect");
+        },
+    events: function(start, end, timezone, callback) {
+        var url = 'http://localhost:3000/getExampleUser';
+        $.ajax({
+            type : 'GET',
+            url: url,
+            dataType: 'json',
+            data: {
+              start: start.format(),
+              end: end.format()
+            },
+            success: function (doc) {
+                var events = [];
+                if(!!doc.result){
+                  $.map(doc.result, function(r){
+                    events.push({
+                      title: r.name,
+                      start: r.start,
+                      end: r.end
+                    });
+                  });
+                }
+                callback(events);
+              }
+
+});
+}
+});
 });
