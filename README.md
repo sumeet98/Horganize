@@ -1,7 +1,4 @@
 # Horganize
-
-calendar code inspired from https://stackoverflow.com/questions/43316726/build-a-calendar-using-javascript-jquery
-
 *****************************************************
 * REFERENCES (FOREIGN CODE)
 *    Title: cssicon
@@ -11,11 +8,12 @@ calendar code inspired from https://stackoverflow.com/questions/43316726/build-a
 *    License: CC0 1.0 Universal
 *    Used: ../public/styles/dashboard.css (Lines 9-12)
 *****************************************************
-*    Title: 
-*    Author: 
-*    Retrieved:
-*    Availability: 
+*    Title: fullCalendar
+*    Author: fullCalendar
+*    Retrieved: 2019-03-21
+*    Availability: https://fullcalendar.io/ 
 *    License: 
+*    Used: ../public/scripts/calendar.js
 *****************************************************
 *    Title: 
 *    Author:
