@@ -471,7 +471,7 @@ app.get('/getExampleUser', function (req, res) {
     appointment2 = new Appointment({
         start: new Date(2019, 03, 27, 16, 0, 0, 0),
         end: new Date(2019, 03, 27, 16, 30, 0, 0),
-        name: 'Pay Fees',
+        title: 'Pay Fees',
         allDay: false
     });
 
