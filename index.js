@@ -464,7 +464,7 @@ app.get('/getExampleUser', function (req, res) {
     appointment1 = new Appointment({
         start: new Date(2019, 03, 23, 10, 0, 0, 0),
         end: new Date(2019, 03, 23, 11, 30, 0, 0),
-        name: 'Hair Appointment @Hairworx',
+        title: 'Hair Appointment @Hairworx',
         allDay: false
     });
 
@@ -699,7 +699,7 @@ function initDB() {
     appointmentSchema = new mongoose.Schema({
         start: Date,
         end: Date,
-        name: String,
+        title: String,
         allDay: Boolean
     });
 
