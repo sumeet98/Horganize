@@ -42,7 +42,7 @@ app.post('/login', function (request, response) {
 });
 
 app.get('/dashboard', function (req, res) {
-    if (req.session.username && req.session.room) { //check if room registered!!
+    if (checkRequest(req)) {
         res.render('dashboard_overview', {
             active: 0,
             username: req.session.username,
@@ -54,7 +54,7 @@ app.get('/dashboard', function (req, res) {
 });
 
 app.get('/setup', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username && req.session.verified) {
         res.sendFile(path.join(__dirname + '/private/setUp.html'));
     } else {
         res.redirect('/login.html');
@@ -64,11 +64,17 @@ app.get('/setup', function (req, res) {
 
 app.post('/register', function (req, res) {
     hashedPassword = bcrypt.hashSync(req.body.pswRegister, 8);
+    req.body.registerToken = nanoid();
     data_access.register(req, res, hashedPassword, registerDone);
 });
 
 app.get('/getProfile', function (req, res) {
-    data_access.getProfile(req, res, getProfileDone);
+    if (checkRequest(req)) {
+        data_access.getProfile(req, res, getProfileDone);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
 });
 
 function getProfileDone(req, res, user) {
@@ -92,7 +98,7 @@ function getProfileDone(req, res, user) {
 }
 
 app.post('/checkRoomExists/:roomName', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username && req.session.verified) {
         data_access.roomExists(req, res, callbackBoolean)
     } else {
         res.status(403);
@@ -102,7 +108,7 @@ app.post('/checkRoomExists/:roomName', function (req, res) {
 
 app.post('/registerRoom/:roomName', function (req, res) {
     console.log('register Room');
-    if (req.session.username) {
+    if (req.session.username && req.session.verified) {
         data_access.addRoom(req, res, registerRoomDone)
 
     } else {
@@ -131,7 +137,7 @@ function registerRoomDone(req, res, error) {
 }
 
 app.post('/getRooms/:search', function (req, res) {
-    if (req.session.username) {
+    if (req.session.username && req.session.verified) {
         res.json(getRoomsFromDB(req.params.search))
     } else {
         res.sendStatus(403);
@@ -139,10 +145,7 @@ app.post('/getRooms/:search', function (req, res) {
 });
 
 app.post('/joinRoom', function (req, res) {
-    console.log(req.params.roomName);
-    console.log(req.body.psw);
-    console.log(req.session.username);
-    if (req.session.username) {
+    if (req.session.username && req.session.verified) {
         data_access.joinRoom(req, res, joinRoomDone);
     } else {
         res.sendStatus(403);
@@ -158,7 +161,7 @@ function joinRoomDone(req, res, error) {
 }
 
 app.get('/logout', function (req, res) {
-    if (req.session.username) {
+    if (checkRequest(req)) {
         log(req.session.username + ' going to be logged out.');
         req.session.destroy(function (error) {
             if (error) {
@@ -177,7 +180,7 @@ app.get('/logout', function (req, res) {
 });
 
 app.get('/shopping', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         res.render('dashboard_shopping', {
             active: 1,
             roomName: req.session.room,
@@ -190,7 +193,7 @@ app.get('/shopping', function (req, res) {
 });
 
 app.get('/tasks', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         res.render('dashboard_tasks', {
             active: 2,
             username: req.session.username
@@ -202,7 +205,7 @@ app.get('/tasks', function (req, res) {
 });
 
 app.get('/calendar', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         res.sendFile(path.join(__dirname + '/private/calendar.html')); //for development purposes
     } else {
         res.status(403);
@@ -211,7 +214,7 @@ app.get('/calendar', function (req, res) {
 });
 
 app.get('/wallet', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         res.render('dashboard_wallet', {
             active: 4,
             username: req.session.username
@@ -223,7 +226,7 @@ app.get('/wallet', function (req, res) {
 });
 
 app.get('/profile', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         res.render('dashboard_profile', {
             active: 5,
             username: req.session.username
@@ -235,7 +238,7 @@ app.get('/profile', function (req, res) {
 });
 
 app.post('/roommates', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         data_access.getRoomMates(req, res, getRoomMatesDone);
     } else {
         res.status(403);
@@ -257,7 +260,7 @@ function getRoomMatesDone(req, res, users) {
     res.send(mates);
 }
 app.get('/getShoppingList', function (req, res) {
-    if (req.session.username  && req.session.room) {
+    if (checkRequest(req)) {
         data_access.getShoppingList(req, res, getShoppingListDone);
     } else {
         res.status(403);
@@ -266,7 +269,7 @@ app.get('/getShoppingList', function (req, res) {
 });
 
 app.get('/admin', function (req, res) {
-    if (req.session.username && req.session.admin  && req.session.room) {
+    if (checkRequest(req) && req.session.admin) {
         res.render('dashboard_admin', {
             username: req.session.username
         });
@@ -286,15 +289,30 @@ function getShoppingListDone(req, res, list) {
 }
 
 app.get('/deleteAllShoppingItems', function (req, res) {
-    data_access.deleteShopping(req, res, callbackBoolean);
+    if (checkRequest(req)) {
+        data_access.deleteShopping(req, res, callbackBoolean);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
 });
 
 app.post('/putShoppingList', function (req, res) {
-    data_access.addShopping(req, res, callbackBoolean);
+    if (checkRequest(req)) {
+        data_access.addShopping(req, res, callbackBoolean);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
 });
 
 app.post('/putShoppingListChecked', function (req, res) {
-    data_access.addShoppingChecked(req, res, callbackBoolean);
+    if (checkRequest(req)) {
+        data_access.addShoppingChecked(req, res, callbackBoolean);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
 });
 
 
@@ -309,7 +327,7 @@ function callbackBoolean(req, res, error) {
 }
 
 app.get('/wipeAll', function (req, res) {
-    if (req.session.username && req.session.admin) {
+    if (checkRequest(req) && req.session.admin) {
         data_access.wipeAll(req, res, callbackBoolean);
     } else if (req.session.username) {
         res.status(404);
@@ -322,7 +340,7 @@ app.get('/wipeAll', function (req, res) {
 });
 
 app.get('/deleteAccount', function (req, res) {
-    if (req.session.username) {
+    if (checkRequest(req)) {
         data_access.deleteUser(req, res, callbackBoolean);
     } else {
         res.status(404);
@@ -332,7 +350,7 @@ app.get('/deleteAccount', function (req, res) {
 });
 
 app.get('/deleteAccountEntry', function (req, res) {
-    if (req.session.username) {
+    if (checkRequest(req)) {
         res.sendFile(path.join(__dirname + '/private/delete.html'));
     } else {
         res.status(404);
@@ -342,7 +360,7 @@ app.get('/deleteAccountEntry', function (req, res) {
 });
 
 app.get('/leaveRoom', function (req, res) {
-    if (req.session.username ) {
+    if (checkRequest(req)) {
         data_access.leaveRoom(req, res, callbackBoolean);
     } else {
         res.status(404);
@@ -351,7 +369,7 @@ app.get('/leaveRoom', function (req, res) {
 });
 
 app.post('/updateProfile', function (req, res) {
-    if (req.session.username) {
+    if (checkRequest(req)) {
         psw = req.body.psw;
         req.body.psw = bcrypt.hashSync(psw, 8);
         data_access.updateProfile(req, res, callbackBoolean);
@@ -362,7 +380,7 @@ app.post('/updateProfile', function (req, res) {
 });
 
 app.post('/appendMessage', function (req, res) {
-    if (req.session.username) {
+    if (checkRequest(req)) {
         data_access.appendMessage(req, res, callbackBoolean);
     } else {
         res.status(404);
@@ -371,7 +389,7 @@ app.post('/appendMessage', function (req, res) {
 });
 
 app.get('/getMessages', function (req, res) {
-    if (req.session.username) {
+    if (checkRequest(req)) {
         data_access.getMessages(req, res, getMessagesDone);
     } else {
         res.status(404);
@@ -385,7 +403,12 @@ function getMessagesDone(req, res, messages) {
 }
 
 app.post('/likeMessage', function (req, res) {
-    data_access.changeLike(req, res, callbackBoolean);
+    if (checkRequest(req)) {
+        data_access.changeLike(req, res, callbackBoolean);
+    } else {
+        res.status(403);
+        res.redirect('/login');
+    }
 });
 
 app.get('/passwordForgot', function (req, res) {
@@ -395,10 +418,10 @@ app.get('/passwordForgot', function (req, res) {
 app.post('/resetPassword', function (req, res) {
     if (req.body.email) {
         req.body.token = nanoid();
-        req.body.resetTokExp = Date.now() + 3600000; 
+        req.body.resetTokExp = Date.now() + 3600000;
         data_access.createPswTok(req, res, resetPasswordSent);
     } else {
-        res.render('landing_message',{
+        res.render('landing_message', {
             message: 'There was no email entered.'
         });
     }
@@ -406,26 +429,26 @@ app.post('/resetPassword', function (req, res) {
 
 function resetPasswordSent(req, res, error, token) {
     if (error) {
-        res.render('landing_message',{
+        res.render('landing_message', {
             message: 'Error while sending password reset email.'
         });
     } else {
         transporter.sendMail({
             to: req.body.email,
             subject: 'Horganize Password Reset',
-            text:   'Hi there!\n\n' + 
-                    'please click on the following link to reset your password: \n' + 
-                    'http://localhost:3000/' + token + ' \n' + 
-                    'This link will automatically log you in and redirect you to the profile page, where you can set your new password. '+
-                    'If your profile is not assigned to a room, you have to complete the setup first. \n\n' + 
-                    'Thanks for using HORGANIZE!'
+            text: 'Hi there!\n\n' +
+                'please click on the following link to reset your password: \n' +
+                'http://localhost:3000/resetPassword/' + token + ' \n' +
+                'This link will automatically log you in and redirect you to the profile page, where you can set your new password. ' +
+                'If your profile is not assigned to a room, you have to complete the setup first. \n\n' +
+                'Thanks for using HORGANIZE!'
         }, function (error, info) {
             if (error) {
-                res.render('landing_message',{
+                res.render('landing_message', {
                     message: 'Could not send password reset email.'
                 });
             } else {
-                res.render('landing_message',{
+                res.render('landing_message', {
                     message: 'Password reset email sent! Have a look at your inbox.'
                 });
             }
@@ -438,14 +461,14 @@ function resetPasswordSent(req, res, error, token) {
 
 app.get('/getExampleUser', function (req, res) {
 
-    appointment1= new Appointment({
+    appointment1 = new Appointment({
         start: new Date(2019, 03, 23, 10, 0, 0, 0),
         end: new Date(2019, 03, 23, 11, 30, 0, 0),
         name: 'Hair Appointment @Hairworx',
         allDay: false
     });
 
-    appointment2= new Appointment({
+    appointment2 = new Appointment({
         start: new Date(2019, 03, 27, 16, 0, 0, 0),
         end: new Date(2019, 03, 27, 16, 30, 0, 0),
         name: 'Pay Fees',
@@ -472,7 +495,7 @@ app.get('/getExampleUser', function (req, res) {
 
 //end of developer section
 
-app.get('/:token', function (req, res) {
+app.get('/resetPassword/:token', function (req, res) {
     if (req.params.token) {
         data_access.checkToken(req, res, resetPasswordComplete);
     } else {
@@ -483,7 +506,7 @@ app.get('/:token', function (req, res) {
 
 function resetPasswordComplete(req, res, error, user) {
     if (error) {
-        res.render('landing_message',{
+        res.render('landing_message', {
             message: 'This link is not valid.'
         });
     } else {
@@ -496,6 +519,38 @@ function resetPasswordComplete(req, res, error, user) {
             req.session.username = user.email;
             req.session.room = user.room;
             req.session.admin = user.admin;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/profile');
+        }
+    }
+}
+
+app.get('/activateAccount/:token', function (req, res) {
+    if (req.params.token) {
+        data_access.checkRegisterToken(req, res, activateAccountComplete);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+});
+
+function activateAccountComplete(req, res, error, user) {
+    if (error) {
+        res.render('landing_message', {
+            message: 'This link is not valid.'
+        });
+    } else {
+        if (user.room == '') {
+            req.session.username = user.email;
+            req.session.admin = user.admin;
+            req.session.verified = user.verified;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/setup');
+        } else {
+            req.session.username = user.email;
+            req.session.room = user.room;
+            req.session.admin = user.admin;
+            req.session.verified = user.verified;
             log(req.session.username + ' successfully logged in.');
             res.redirect('/profile');
         }
@@ -570,10 +625,27 @@ function registerDone(req, res, error) {
         }
 
     } else {
-        res.status(200);
-        res.render('landing_message', {
-            message: 'Registration successful. You can now login.'
+        transporter.sendMail({
+            to: req.body.emailRegister,
+            subject: 'Horganize Email Verification',
+            text: 'Hi there!\n\n' +
+                'please click on the following link to verify your email adress: \n' +
+                'http://localhost:3000/activateAccount/' + req.body.registerToken + ' \n' +
+                'This link will automatically log you in and you can continue setting up your profile.\n \n ' +
+                'Thanks for using HORGANIZE!'
+        }, function (error, info) {
+            if (error) {
+                res.render('landing_message', {
+                    message: 'An error occured during registration.'
+                });
+            } else {
+                res.status(200);
+                res.render('landing_message', {
+                    message: 'Registration successful. Please look at your inbox and verify your email adress.'
+                });
+            }
         });
+
     }
 }
 
@@ -581,20 +653,28 @@ function performLogin(req, res, user) {
     if (user) {
         if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
             console.log(user);
-            if (user.room == '') {
+            if (user.room == '' && user.verified) {
                 req.session.username = req.body.emailLogin;
                 req.session.admin = user.admin;
+                req.session.verified = user.verified;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/setup');
-            } else {
+            } else if(user.verified){
                 req.session.username = req.body.emailLogin;
                 req.session.room = user.room;
                 req.session.admin = user.admin;
+                req.session.verified = user.verified;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/dashboard');
+            } else{
+                res.status(403);
+                res.render('landing_message', {
+                    message: 'Please verify your email. '
+                })
             }
         } else {
             log(req.session.username + ' attempted login.');
+            res.status(403);
             res.render('landing_message', {
                 message: 'Username or password incorrect. Please try again. '
             })
@@ -642,11 +722,13 @@ function initDB() {
         admin: Boolean,
         resetTok: String,
         resetTokExp: Date,
+        registerToken: String,
+        verified: Boolean,
         appointments: [appointmentSchema]
     }, { collection: 'users' });
     User = mongoose.model('user', userSchema);
 
-    
+
 
     User.deleteOne({ email: 'admin@horganize.com' }, function (error) {
         if (error) {
@@ -664,7 +746,10 @@ function initDB() {
             room: 'ADMIN',
             admin: true,
             resetTok: '',
-            resetTokExp: ''
+            resetTokExp: '',
+            registerToken: '',
+            verified: true,
+            appointments: []
         }).save(function (err) {
             if (err) {
                 log('Standard Admin could not be recreated: ' + err);
@@ -723,9 +808,10 @@ function initMailer() {
             user: "mailhorganize@gmail.com",
             pass: "horganizem19"
         }
-    }, 
-    {   from: "mailhorganize@gmail.com"
-    });
+    },
+        {
+            from: "mailhorganize@gmail.com"
+        });
 
     transporter.verify(function (error) {
         if (error) {
@@ -734,5 +820,13 @@ function initMailer() {
             log('Connection to email server verified.')
         }
     })
+}
+
+function checkRequest(req) { //seperate Function for all required checks to make changes easy
+    if (req.session.username && req.session.room && req.session.verified) {
+        return true;
+    } else {
+        return false;
+    }
 }
 

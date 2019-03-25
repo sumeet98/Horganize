@@ -12,7 +12,12 @@ exports.register = function (req, res, hashedPassword, callback) {
         school: req.body.schoolRegister,
         pswHashed: hashedPassword,
         room: '',
-        admin: admin
+        admin: admin,
+        resetTok: '',
+        resetTokExp: '',
+        registerToken: req.body.registerToken,
+        verified: false,
+        appointments: []
     }).save(function (error) {
         if (error) {
             callback(req, res, error);
@@ -309,7 +314,7 @@ exports.changeLike = function (req, res, callback) {
                     }
                     if (req.body.like == 'true') {
                         room[0].messages[i].liked.push(req.session.username);
-                    } 
+                    }
                     room[0].save(function (error) {
                         callback(req, res, error);
                     });
@@ -345,8 +350,8 @@ exports.getMessages = function (req, res, callback) {
 }
 
 exports.createPswTok = function (req, res, callback) {
-    User.findOneAndUpdate({email: req.body.email}, { $set: { resetTok: req.body.token, resetTokExp: req.body.resetTokExp} }, function (error, result) {
-        
+    User.findOneAndUpdate({ email: req.body.email }, { $set: { resetTok: req.body.token, resetTokExp: req.body.resetTokExp } }, function (error, result) {
+
         if (error || !result) {
             callback(req, res, new Error('User not found'), req.body.token);
         } else {
@@ -356,7 +361,7 @@ exports.createPswTok = function (req, res, callback) {
 }
 
 exports.checkToken = function (req, res, callback) {
-    User.findOne({resetTok: req.params.token}, function(error, user){
+    User.findOne({ resetTok: req.params.token }, function (error, user) {
         if (!user) {
             callback(req, res, new Error('Token not found'), null);
         } else {
@@ -367,4 +372,16 @@ exports.checkToken = function (req, res, callback) {
             }
         }
     });
+}
+
+exports.checkRegisterToken = function (req, res, callback) {
+    User.findOneAndUpdate({ registerToken: req.params.token }, { $set: { verified: true, registerToken: '' } }, function (error, user) {
+        if (!user) {
+            callback(req, res, new Error('Register Token not found'), null);
+        } else {
+            user.verified = true;
+            callback(req, res, null, user);
+        }
+    });
+
 }
