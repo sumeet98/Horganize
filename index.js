@@ -459,7 +459,7 @@ function resetPasswordSent(req, res, error, token) {
 
 //for developer use only
 
-app.get('/getExampleUser', function (req, res) {
+app.post('/getExampleUser', function (req, res) {
 
     appointment1 = new Appointment({
         start: new Date(2019, 03, 23, 10, 0, 0, 0),
