@@ -13,17 +13,17 @@ block content
             form(id="updateForm" class="triple")
                 label(class="entry") Password
                 div
-                    input(class="entry", id="pswNew", name="pswNew", type="password")
+                    input(class="entry", id="pswNew", name="pswNew", type="password", maxlength="40")
                 span(id="pswMessage")
                 
                 label(class="entry") Repeat Password*
                 div
-                    input(id="pswNewRepeat",class="entry", type="password")
+                    input(id="pswNewRepeat",class="entry", type="password", maxlength="40")
                 span(id="pswRepMessage")
                 
                 label(class="entry") Adress
                 div
-                    input(id="adressNew", name="adressNew", class="entry")
+                    input(id="adressNew", name="adressNew", class="entry", maxlength="40")
                 span(id="adrMessage")
         hr
         div(id="buttons" class="triple")

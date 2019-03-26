@@ -59,6 +59,12 @@ input{
     margin-left: 1em;
   }
 
+.genButton:hover{
+    background-color: #eaeaea;
+    box-shadow: 0 1px 0;
+}
+
+
 
   .bigButton{
     border: black;
@@ -75,8 +81,10 @@ input{
 
 }
 
+
 .bigButton:hover {
-    box-shadow: 0.5px 0.5px 0.5px inset;
+    background-color: #eaeaea;
+    box-shadow: 0 1px 0;
 }
 .featureContainer{
     margin: 40px;

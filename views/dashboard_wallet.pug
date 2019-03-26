@@ -18,16 +18,16 @@ block content
         div(class="input triple space")
             div
                 span Price: 
-                input(id="price")
+                input(id="price", maxlength="40")
             div
                 span What: 
-                input(id="what")
+                input(id="what", maxlength="40")
                  
             div 
                 button(class="genButton" id="append") Append
         div(class="input space")
             span For who: 
-            input(id="who" type="hidden")
+            input(id="who" type="hidden", maxlength="40")
             ul(id="users" class="inline")
                     
 
