@@ -1,3 +1,7 @@
+var pswPattern1 = /.{8,}/; //at least 8 characters
+var pswPattern2 = /.*([A-Z]+).*/; //at least 1 upper case character
+var pswPattern3 = /.*([a-z]+).*/; //at least 1 lower case character
+var pswPattern4 = /.*([0-9]+).*/; //at least 1 number
 $(document).ready(function () {
     $.get("/getProfile",
         function (profile) {
@@ -25,10 +29,16 @@ $(document).ready(function () {
     );
 
     $('#pswNew').focusout(function () {
-        if (!$('#pswNewRepeat').val() == '' && $('#pswNewRepeat').val() != $('#pswNew').val()) {
-            $('#pswRepMessage').html('Passwords different.');
+        if ($('#pswNewRepeat').val() != $('#pswNew').val() && testAllPasswordPatterns($('#pswNew').val())) { //Different but meet req
+            $('#pswRepMessage').html('Invalid.');
             pswValid = false;
-        } else {
+        } else if(!testAllPasswordPatterns($('#pswNew').val()) && $('#pswNewRepeat').val() === $('#pswNew').val()){ //Not diff but no req
+            $('#pswRepMessage').html('Invalid.');
+            pswValid = false;
+        } else if(!testAllPasswordPatterns($('#pswNew').val()) && $('#pswNewRepeat').val() != $('#pswNew').val()){ // Diff AND REQ Fail
+            $('#pswRepMessage').html('Invalid.');
+            pswValid = false;
+        }else {
             $('#pswRepMessage').empty();
             pswValid = true;
         }
@@ -36,9 +46,9 @@ $(document).ready(function () {
 
     $('#pswNewRepeat').focusout(function () {
         if (!$('#pswNew').val() == '' && $('#pswNew').val() != $('#pswNewRepeat').val()) {
-            $('#pswRepMessage').html('Passwords different.');
+            $('#pswRepMessage').html('Invalid.');
             pswValid = false;
-        } else {
+        } else if($('#pswNew').val() === $('#pswNewRepeat').val() && testAllPasswordPatterns($('#pswNewRepeat').val())){
             $('#pswRepMessage').empty();
             pswValid = true;
         }
@@ -62,7 +72,7 @@ $(document).ready(function () {
 
     $('#submit').click(function (e) {
         e.preventDefault();
-        if (pswValid && $('#pswNew').val() === $('#pswNewRepeat').val() && $('#pswNewRepeat').val() != '' && $('#pswNew').val() != '') {
+        if (pswValid && $('#pswNew').val() === $('#pswNewRepeat').val() && $('#pswNewRepeat').val() != '' && $('#pswNew').val() != '' && testAllPasswordPatterns($('#pswNewRepeat').val())) {
             $.post("/updateProfile", {
                 psw: $('#pswNewRepeat').val(),
                 adress: $('#adressNew').val()
@@ -99,7 +109,7 @@ $(document).ready(function () {
                 }
             );
         } else {
-            $('#message').html('Cannot submit invalid data. Password is either not identical or empty.');
+            $('#message').html('Cannot submit invalid data. Password is either not identical or invalid (see requirements below).');
         }
     });
 
@@ -107,3 +117,11 @@ $(document).ready(function () {
 
 
 });
+
+function testAllPasswordPatterns(val) {
+    if (pswPattern1.test(val) && pswPattern2.test(val) && pswPattern3.test(val) && pswPattern4.test(val)) {
+        return true;
+    } else {
+        return false;
+    }
+}

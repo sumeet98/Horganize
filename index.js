@@ -513,12 +513,14 @@ function resetPasswordComplete(req, res, error, user) {
         if (user.room == '') {
             req.session.username = user.email;
             req.session.admin = user.admin;
+            req.session.verified = user.verified;
             log(req.session.username + ' successfully logged in.');
             res.redirect('/setup');
         } else {
             req.session.username = user.email;
             req.session.room = user.room;
             req.session.admin = user.admin;
+            req.session.verified = user.verified;
             log(req.session.username + ' successfully logged in.');
             res.redirect('/profile');
         }

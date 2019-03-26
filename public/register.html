@@ -52,17 +52,18 @@
         <form id="registerForm" action="/register" method="post" onsubmit="return validateForm()">
             <div id="registerContainer">
                 <h2>Register</h2>
+                
                 <div>
                     <Label>Email*</Label>
                     <input class="inputField required" type="email" id="emailRegister" name="emailRegister" maxlength="40">
                 </div>
                 <div>
                     <label>Password*</label>
-                    <input class="inputField required" type="password" id="pswRegister" name="pswRegister" maxlength="40">
+                    <input class="inputField required" type="password" id="pswRegister" name="pswRegister" maxlength="40" minlength="8">
                 </div>
                 <div>
                     <label>Repeat Password*</label>
-                    <input class="inputField required" type="password" id="pswRepeatRegister" maxlength="40">
+                    <input class="inputField required" type="password" id="pswRepeatRegister" maxlength="40" minlength="8">
                 </div>
                 <div>
                     <label>First Name*</label>
