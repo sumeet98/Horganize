@@ -659,14 +659,14 @@ function performLogin(req, res, user) {
                 req.session.verified = user.verified;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/setup');
-            } else if(user.verified){
+            } else if (user.verified) {
                 req.session.username = req.body.emailLogin;
                 req.session.room = user.room;
                 req.session.admin = user.admin;
                 req.session.verified = user.verified;
                 log(req.session.username + ' successfully logged in.');
                 res.redirect('/dashboard');
-            } else{
+            } else {
                 res.status(403);
                 res.render('landing_message', {
                     message: 'Please verify your email. '
@@ -718,7 +718,7 @@ function initDB() {
         adress: String,
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
         pswHashed: { type: String, require: true },
-        room: String,
+        room: { type: String, ref: 'room' },
         admin: Boolean,
         resetTok: String,
         resetTokExp: Date,
@@ -761,20 +761,13 @@ function initDB() {
     });
 
 
-    shoppingSchema = new mongoose.Schema({
-        room: {
-            type: String,
-            index: true,
-            unique: true,
-            require: true
-        },
-        items: [{
-            name: String,
-            quantity: Number,
-            done: Boolean
-        }]
-    }, { collection: 'shoppingLists' });
-    List = mongoose.model('shoppingList', shoppingSchema);
+    shoppingItemSchema = new mongoose.Schema({
+        name: String,
+        quantity: Number,
+        done: Boolean
+
+    });
+    ShoppingItem = mongoose.model('shoppingItem', shoppingItemSchema);
 
     messagesSchema = new mongoose.Schema({
         user: String,
@@ -793,6 +786,7 @@ function initDB() {
             require: true
         },
         messages: [messagesSchema],
+        items: [shoppingItemSchema],
         secret: { require: true, type: String }
     }, { collection: 'rooms' });
     Room = mongoose.model('room', roomSchema);

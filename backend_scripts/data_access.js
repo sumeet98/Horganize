@@ -41,9 +41,8 @@ exports.getUser = function (req, res, callback) {
 exports.deleteShopping = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
-            List.find({ room: user[0].room }).remove(function (error, numAffected) {
+            Room.findOneAndUpdate({ name: user[0].room }, { $set: { "items": [] } }, function (error, room) {
                 console.log(error);
-                List.find({ room: user[0].room }).then(function (list) { console.log(list) });
                 callback(res, res, error);
             });
         }
@@ -51,30 +50,17 @@ exports.deleteShopping = function (req, res, callback) {
 }
 
 exports.addShopping = function (req, res, callback) {
-
-    newItem = { name: req.body.it, quantity: req.body.qu, done: false };
+    item = new ShoppingItem({name: req.body.it, quantity: req.body.qu, done: false});
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
-            List.find({ room: user[0].room }).then(function (list) {
-                if (list.length > 0) {
-                    list[0].items.push(newItem);
-                    list[0].save(function (error) {
+            Room.findOne({ name: user[0].room }).then(function (room) {
+                if (room) {
+                    room.items.push(item);
+                    room.save(function (error) {
                         callback(res, res, error);
                     });
                 } else {
-                    new List({
-                        room: user[0].room,
-                        list: [newItem]
-                    }).save(function (error) {
-                        List.find({ room: user[0].room }).then(function (list) {
-                            if (list.length > 0) {
-                                list[0].items.push(newItem);
-                                list[0].save(function (error) {
-                                    callback(res, res, error);
-                                });
-                            }
-                        });
-                    });
+                    callback(req, res, new Error('Room not found'));
                 }
 
             });
@@ -85,10 +71,10 @@ exports.addShopping = function (req, res, callback) {
 exports.getShoppingList = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
-            List.find({ room: user[0].room }).then(function (list) {
-                if (list.length > 0) {
-                    console.log(list);
-                    callback(req, res, list);
+            Room.findOne({ name: user[0].room }).then(function (room) {
+                if (room) {
+                    console.log(room);
+                    callback(req, res, room);
                 } else {
                     callback(req, res, null);
                 }
@@ -100,12 +86,12 @@ exports.getShoppingList = function (req, res, callback) {
 exports.addShoppingChecked = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
-            List.find({ room: user[0].room }).then(function (list) {
-                if (list.length > 0) {
-                    console.log(list);
-                    console.log(list[0].items[req.body.index]);
-                    list[0].items[req.body.index].done = req.body.checked;
-                    list[0].save(function (error) {
+            Room.findOne({ name: user[0].room }).then(function (room) {
+                if (room) {
+                    console.log(room);
+                    console.log(room.items[req.body.index]);
+                    room.items[req.body.index].done = req.body.checked;
+                    room.save(function (error) {
                         callback(res, res, error);
                     });
                 } else {

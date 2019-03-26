@@ -41,8 +41,8 @@ $(document).ready(function () {
 function reloadList() {
     $('#shoppingList').html('');
     $.get("/getShoppingList", function (data) {
-        if (data.length > 0) {
-            $.each(data[0].items, function (index, value) {
+        if (data) {
+            $.each(data.items, function (index, value) {
                 checked = '';
                 doneClass = '';
                 if (value.done) {
