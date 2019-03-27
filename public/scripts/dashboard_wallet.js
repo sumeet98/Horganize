@@ -1,21 +1,6 @@
 $(document).ready(function () {
 
-    $.post("/getDebts", 
-        function (response) {
-            if (response.length === 2) { //getting exp and debts back
-                for (let i = 0; i < response[0].length; i++) {
-                    console.log(response[0][i].name);
-                    console.log(response[0][i].amountCents);
-                }
-                for (let i = 0; i < response[1].length; i++) {
-                    console.log(response[1][i].from);
-                    console.log(response[1][i].to);
-                    console.log(response[1][i].amountCents);
-                }
-            }
-        }
-    );
-
+    reloadDebts();
     $.post("/roommates", function (data) {
         for (let i = 0; i < data.length; i++) {
             $('#users').append('<li class="space">' + data[i].firstName + ' ' +
@@ -58,5 +43,27 @@ $(document).ready(function () {
 
 });
 function reloadDebts() {
-    
+    $.post("/getDebts", 
+        function (response) {
+            if (response.length === 2) { //getting exp and debts back
+
+                $('#expenditures').empty();
+                $('#debts').empty();
+                
+                for (let i = 0; i < response[0].length; i++) {
+                    amountDollar = (response[0][i].amountCents / 100);
+                    $('#expenditures').append('<div class="message">'+ response[0][i].name + ': '+amountDollar +'$</div>');
+                    console.log(response[0][i].name);
+                    console.log(response[0][i].amountCents);
+                }
+                for (let i = 0; i < response[1].length; i++) {
+                    amountDollar = (response[1][i].amountCents / 100);
+                    $('#debts').append('<div class="message">'+ response[1][i].from + ' owes you: '+amountDollar +'$</div>');
+                    console.log(response[1][i].from);
+                    console.log(response[1][i].to);
+                    console.log(response[1][i].amountCents);
+                }
+            }
+        }
+    );
 }

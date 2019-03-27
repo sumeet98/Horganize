@@ -409,6 +409,7 @@ exports.addDebt = function (req, res, callback) {
                             if (!done) {
                                 //otherwise push the new debt  
                                 debt.from = users[i].email;
+                                debt.fromFirst = users[i].firstName;
                                 users[i].debts.push(debt);
                             }
                             users[i].save(function (savingError) {

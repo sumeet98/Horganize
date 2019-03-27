@@ -729,10 +729,10 @@ function initDB() {
         title: String,
         allDay: Boolean
     });
-    Appointment = mongoose.model('appointment', appointmentSchema);
+    Appointment = mongoose.model('Appointment', appointmentSchema);
 
     expenditureSchema = new mongoose.Schema({
-        id: {type: Number, index: true, unique: true}, //for security: create unique id on user basis for the client to hide mongoose id 
+        id: {type: Number, required: true}, //for security: create unique id on user basis for the client to hide mongoose id 
         name: {type: String, required: true, trim: true},
         amountCents: Number,
     });
@@ -753,15 +753,21 @@ function initDB() {
             unique: true,
             require: true
         },
-        firstName: { type: String, require: true },
-        lastName: { type: String, require: true },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
         adress: String,
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
-        pswHashed: { type: String, require: true },
+        pswHashed: { type: String, required: true },
         room: { type: String, ref: 'Room' },
-        admin: Boolean,
+        admin: {type: Boolean, required: true, default: false},
         resetTok: String,
-        resetTokExp: Date,
+        resetTokExp: {type: Date, validate: {validator: function (val) {
+            if (!val) {
+                return true;
+            } else {
+                return val >  Date.now()
+            }
+        }}},
         registerToken: String,
         verified: Boolean,
         appointments: [appointmentSchema],
