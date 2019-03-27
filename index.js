@@ -26,7 +26,7 @@ app.use(session({
     }
 }));
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'pug');
@@ -559,6 +559,31 @@ function activateAccountComplete(req, res, error, user) {
     }
 }
 
+app.post('/addDebt', function (req, res) {
+    if (checkRequest(req)) {
+        data_access.addDebt(req, res, callbackBoolean);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+});
+
+app.post('/getDebts', function (req, res) {
+    if (checkRequest(req)) {
+        data_access.getDebts(req, res, getDebtsDone);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+});
+
+function getDebtsDone(req, res, exp, debts) {
+    //put both parameters in one array to send back to client
+    response = [];
+    response.push(exp, debts);
+    res.send(response);
+}
+
 app.listen(app.get('port'), function () {
     log('Server started up and is now listening on port:' + app.get('port'));
 });
@@ -704,8 +729,21 @@ function initDB() {
         title: String,
         allDay: Boolean
     });
-
     Appointment = mongoose.model('appointment', appointmentSchema);
+
+    expenditureSchema = new mongoose.Schema({
+        id: {type: Number, index: true, unique: true}, //for security: create unique id on user basis for the client to hide mongoose id 
+        name: {type: String, required: true, trim: true},
+        amountCents: Number,
+    });
+    Expenditure = mongoose.model('Expenditure', expenditureSchema);
+
+    debtSchema = new mongoose.Schema({
+        to: {type: String, required: true, ref: 'User'},
+        from: {type: String, required: true, ref: 'User'},
+        amountCents: Number,
+    });
+    Debt = mongoose.model('Debt', debtSchema);
 
     userSchema = new mongoose.Schema({
         email: {
@@ -720,15 +758,17 @@ function initDB() {
         adress: String,
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
         pswHashed: { type: String, require: true },
-        room: { type: String, ref: 'room' },
+        room: { type: String, ref: 'Room' },
         admin: Boolean,
         resetTok: String,
         resetTokExp: Date,
         registerToken: String,
         verified: Boolean,
-        appointments: [appointmentSchema]
+        appointments: [appointmentSchema],
+        expenditures: [expenditureSchema],
+        debts: [debtSchema]
     }, { collection: 'users' });
-    User = mongoose.model('user', userSchema);
+    User = mongoose.model('User', userSchema);
 
 
 
@@ -751,7 +791,9 @@ function initDB() {
             resetTokExp: '',
             registerToken: '',
             verified: true,
-            appointments: []
+            appointments: [],
+            expenditures: [],
+            debts: []
         }).save(function (err) {
             if (err) {
                 log('Standard Admin could not be recreated: ' + err);
@@ -769,7 +811,7 @@ function initDB() {
         done: Boolean
 
     });
-    ShoppingItem = mongoose.model('shoppingItem', shoppingItemSchema);
+    ShoppingItem = mongoose.model('ShoppingItem', shoppingItemSchema);
 
     messagesSchema = new mongoose.Schema({
         user: String,
@@ -778,7 +820,7 @@ function initDB() {
         email: String,
         liked: [String]
     });
-    Message = mongoose.model('message', messagesSchema);
+    Message = mongoose.model('Message', messagesSchema);
 
     roomSchema = new mongoose.Schema({
         name: {
@@ -791,7 +833,7 @@ function initDB() {
         items: [shoppingItemSchema],
         secret: { require: true, type: String }
     }, { collection: 'rooms' });
-    Room = mongoose.model('room', roomSchema);
+    Room = mongoose.model('Room', roomSchema);
 
 }
 

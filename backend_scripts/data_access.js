@@ -50,7 +50,7 @@ exports.deleteShopping = function (req, res, callback) {
 }
 
 exports.addShopping = function (req, res, callback) {
-    item = new ShoppingItem({name: req.body.it, quantity: req.body.qu, done: false});
+    item = new ShoppingItem({ name: req.body.it, quantity: req.body.qu, done: false });
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
             Room.findOne({ name: user[0].room }).then(function (room) {
@@ -371,3 +371,87 @@ exports.checkRegisterToken = function (req, res, callback) {
     });
 
 }
+
+exports.addDebt = function (req, res, callback) {
+    User.findOne({ email: req.session.username }).then(function (user) {
+        if (user) {
+            //first add expenditure to user with new unique id 
+            amountCents = Number((req.body.val * 100));
+            if (user.expenditures.length === 0) {
+                expenditure = new Expenditure({ id: 1, name: req.body.what, amountCents: amountCents });
+                user.expenditures.push(expenditure);
+            } else {
+                highestId = 0;
+                for (let i = 0; i < user.expenditures.length; i++) {
+                    if (user.expenditures[i].id > highestId) {
+                        highestId = user.expenditures[i].id;
+                    }
+                }
+                newExpenditure = new Expenditure({ id: (highestId + 1), name: req.body.what, amountCents: amountCents });
+                user.expenditures.push(newExpenditure);
+            }
+            //then add debts
+            user.save(function (error) {
+                if (req.body.who.length != 0) {//no division by zero!!
+                    done = false;
+                    amountEach = amountCents / req.body.who.length;
+                    debt = new Debt({ to: req.session.username, amountCents: amountEach });
+                    User.find({ email: { $in: req.body.who } }, function (error, users) {
+                        savingErrors = [];
+                        for (let i = 0; i < users.length; i++) {
+                            for (let j = 0; j < users[i].debts.length; j++) {
+                                //if theres already a debt to the desired person add the amount up
+                                if (users[i].debts[j].to === req.session.username) {
+                                    users[i].debts[j].amountCents = users[i].debts[j].amountCents + amountEach;
+                                    done = true;
+                                }
+                            }
+                            if (!done) {
+                                //otherwise push the new debt  
+                                debt.from = users[i].email;
+                                users[i].debts.push(debt);
+                            }
+                            users[i].save(function (savingError) {
+                                savingErrors.push(savingError);
+    
+                                if (savingErrors.length === users.length) {
+                                    errorHappened = false;
+                                    for (let k = 0; k < savingErrors.length; k++) {
+                                        if (savingErrors[k]) {
+                                            errorHappened = true;
+                                        } 
+                                    }
+                                    callback(req, res, errorHappened);
+                                }
+                            });
+                        }
+                    });
+                }                 
+            });
+        } else {
+            callback(req, res, new Error('User not found.'));
+        }
+    });
+}
+
+exports.getDebts = function (req, res, callback) {
+    exp = null;
+    debts = [];
+    User.findOne({email: req.session.username}).then(function (user) {
+        exp = user.expenditures;
+        //get all users who owe the current user money
+        User.find({room: user.room}).then(function (users) {
+            for (let i = 0; i < users.length; i++) {
+                for (let j = 0; j < users[i].debts.length; j++) {
+                    if (users[i].debts[j].to === req.session.username) {
+                        console.log(users[i].debts[j]);
+                        debts.push(users[i].debts[j]);
+                    } 
+                }
+            }
+            callback(req, res, exp, debts);
+        });
+    });
+}
+
+
