@@ -579,6 +579,10 @@ app.post('/getDebts', function (req, res) {
     }
 });
 
+app.get('/about', function (req, res) {
+    res.render('landing_about', {});
+});
+
 function getDebtsDone(req, res, exp, debts) {
     //put both parameters in one array to send back to client
     response = [];

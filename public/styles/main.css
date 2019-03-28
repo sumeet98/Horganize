@@ -87,13 +87,22 @@ input{
     box-shadow: 0 1px 0;
 }
 .featureContainer{
-    margin: 40px;
+    margin: 20px;
     padding: 20px;
 }
 
 .featureImage{
     width: 50%;
     height: auto;
+}
+
+.framedPicture{
+    width: 200px;
+    height: auto;
+    border-style: solid;
+    border-color: black;
+    border-width: thin;
+
 }
 
 footer{
