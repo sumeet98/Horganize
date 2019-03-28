@@ -138,14 +138,6 @@ function registerRoomDone(req, res, error) {
     }
 }
 
-app.post('/getRooms/:search', function (req, res) {
-    if (req.session.username && req.session.verified) {
-        res.json(getRoomsFromDB(req.params.search))
-    } else {
-        res.sendStatus(403);
-    }
-});
-
 app.post('/joinRoom', function (req, res) {
     if (req.session.username && req.session.verified) {
         data_access.joinRoom(req, res, joinRoomDone);
@@ -320,7 +312,6 @@ app.post('/putShoppingListChecked', function (req, res) {
 
 function callbackBoolean(req, res, error) {
     if (error) {
-        res.status(500);
         res.send(false);
     } else {
         res.status(200);
@@ -590,6 +581,15 @@ function getDebtsDone(req, res, exp, debts) {
     res.send(response);
 }
 
+app.post('/debtDone', function (req, res) {
+    if (checkRequest(req)) {
+        data_access.debtDone(req, res, callbackBoolean);
+    } else {
+        res.status(403);
+        res.redirect('/login.html');
+    }
+});
+
 app.listen(app.get('port'), function () {
     log('Server started up and is now listening on port:' + app.get('port'));
 });
@@ -607,33 +607,6 @@ app.use(function (err, req, res, next) {
         message: 'Sorry, an internal error occured.'
     });
 });
-
-function registerRoom(roomName, userName) {
-    //implement db check here
-    if (roomName === ':default') {
-        console.log('Room registered: ' + roomName + ' with User ' + userName);
-        return true;
-    } else {
-        console.log('something')
-        return false;
-    }
-}
-
-function getRoomsFromDB(search) {
-    //implement db lookup with search here
-    return {
-        "rooms": [{
-            "name": "test",
-            "adress": "simcoe"
-        }, {
-            "name": "test2",
-            "adress": "south"
-        }]
-    };
-}
-
-
-
 
 function registerDone(req, res, error) {
 
@@ -747,6 +720,7 @@ function initDB() {
     debtSchema = new mongoose.Schema({
         to: {type: String, required: true, ref: 'User'},
         from: {type: String, required: true, ref: 'User'},
+        fromFirst: String,
         amountCents: Number,
     });
     Debt = mongoose.model('Debt', debtSchema);
@@ -847,6 +821,25 @@ function initDB() {
     }, { collection: 'rooms' });
     Room = mongoose.model('Room', roomSchema);
 
+    Room.deleteOne({ name: 'ADMIN' }, function (error) {
+        if (error) {
+            log('ADMIN ROOM could not be deleted: ' + error);
+        } else {
+            log('ADMIN ROOM deleted.');
+        }
+        new Room({
+            name: 'ADMIN',
+            messages: [],
+            items: [],
+            secret: 'ADMIN'
+        }).save(function (err) {
+            if (err) {
+                log('ADMIN ROOM could not be recreated: ' + err);
+            } else {
+                log('ADMIN ROOM recreated');
+            }
+        });
+    });
 }
 
 function initMailer() {

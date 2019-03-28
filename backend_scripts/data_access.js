@@ -136,7 +136,6 @@ exports.addRoom = function (req, res, callback) {
 exports.wipeAll = function (req, res, callback) {
     User.deleteMany({}, function (errorUser) {
         Room.deleteMany({}, function (errorRoom) {
-
             if (errorUser || errorRoom) {
                 callback(req, res, new Error('Wipe Error'));
             } else {
@@ -148,11 +147,11 @@ exports.wipeAll = function (req, res, callback) {
 }
 
 exports.joinRoom = function (req, res, callback) {
-    Room.find({ name: req.body.roomName, secret: req.body.psw }).then(function (room) {
-        if (room.length > 0) {
+    Room.findOne({ name: req.body.roomName, secret: req.body.psw }).then(function (room) {
+        if (room && room.name != 'ADMIN') {
             User.find({ email: req.session.username }).then(function (user) {
                 if (user.length > 0) {
-                    user[0].room = req.body.roomName;
+                    user[0].room = room.name;
                     user[0].save(function (error) {
                         req.session.room = req.body.roomName;
                         callback(req, res, error);
@@ -447,13 +446,29 @@ exports.getDebts = function (req, res, callback) {
             for (let i = 0; i < users.length; i++) {
                 for (let j = 0; j < users[i].debts.length; j++) {
                     if (users[i].debts[j].to === req.session.username) {
-                        console.log(users[i].debts[j]);
                         debts.push(users[i].debts[j]);
                     }
                 }
             }
             callback(req, res, exp, debts);
         });
+    });
+}
+
+exports.debtDone = function (req, res, callback) {
+    User.findOne({ email: req.body.from }).then(function (user) {
+        if (user) {
+            for (let i = 0; i < user.debts.length; i++) {
+                if (user.debts[i].to === req.session.username) {
+                    user.debts.splice(i, 1);
+                }
+            }
+            user.save(function (savingError) {
+                callback(req, res, savingError);
+            });
+        }else{
+            callback(req, res, new Error('Debt not found.'));
+        }
     });
 }
 
