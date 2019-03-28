@@ -17,7 +17,9 @@ exports.register = function (req, res, hashedPassword, callback) {
         resetTokExp: '',
         registerToken: req.body.registerToken,
         verified: false,
-        appointments: []
+        appointments: [],
+        expenditures: [],
+        debts: []
     }).save(function (error) {
         if (error) {
             callback(req, res, error);
@@ -134,13 +136,13 @@ exports.addRoom = function (req, res, callback) {
 exports.wipeAll = function (req, res, callback) {
     User.deleteMany({}, function (errorUser) {
         Room.deleteMany({}, function (errorRoom) {
-            List.deleteMany({}, function (errorList) {
-                if (errorUser || errorRoom || errorList) {
-                    callback(req, res, new Error('Wipe Error'));
-                } else {
-                    callback(req, res, null);
-                }
-            });
+
+            if (errorUser || errorRoom) {
+                callback(req, res, new Error('Wipe Error'));
+            } else {
+                callback(req, res, null);
+            }
+
         });
     });
 }
@@ -414,20 +416,20 @@ exports.addDebt = function (req, res, callback) {
                             }
                             users[i].save(function (savingError) {
                                 savingErrors.push(savingError);
-    
+
                                 if (savingErrors.length === users.length) {
                                     errorHappened = false;
                                     for (let k = 0; k < savingErrors.length; k++) {
                                         if (savingErrors[k]) {
                                             errorHappened = true;
-                                        } 
+                                        }
                                     }
                                     callback(req, res, errorHappened);
                                 }
                             });
                         }
                     });
-                }                 
+                }
             });
         } else {
             callback(req, res, new Error('User not found.'));
@@ -438,16 +440,16 @@ exports.addDebt = function (req, res, callback) {
 exports.getDebts = function (req, res, callback) {
     exp = null;
     debts = [];
-    User.findOne({email: req.session.username}).then(function (user) {
+    User.findOne({ email: req.session.username }).then(function (user) {
         exp = user.expenditures;
         //get all users who owe the current user money
-        User.find({room: user.room}).then(function (users) {
+        User.find({ room: user.room }).then(function (users) {
             for (let i = 0; i < users.length; i++) {
                 for (let j = 0; j < users[i].debts.length; j++) {
                     if (users[i].debts[j].to === req.session.username) {
                         console.log(users[i].debts[j]);
                         debts.push(users[i].debts[j]);
-                    } 
+                    }
                 }
             }
             callback(req, res, exp, debts);

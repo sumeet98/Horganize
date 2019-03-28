@@ -8,6 +8,7 @@ var data_access = require('./backend_scripts/data_access')
 var bcrypt = require('bcrypt');
 var nodemailer = require('nodemailer');
 var nanoid = require("nanoid");
+var filter = require('content-filter');
 var app = express();
 app.set('port', process.env.PORT || 3000);
 mongoose.connect('mongodb://localhost:27017/horganize', { useNewUrlParser: true });
@@ -27,6 +28,7 @@ app.use(session({
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(filter());
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'pug');
@@ -762,7 +764,7 @@ function initDB() {
         admin: {type: Boolean, required: true, default: false},
         resetTok: String,
         resetTokExp: {type: Date, validate: {validator: function (val) {
-            if (!val) {
+            if (val=='' || !val) {
                 return true;
             } else {
                 return val >  Date.now()
