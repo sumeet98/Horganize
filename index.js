@@ -450,43 +450,40 @@ function resetPasswordSent(req, res, error, token) {
     }
 }
 
-//for developer use only
+app.post('/addAppointment', function (req, res) {
+    if (checkRequest(req)) {
+        if (req.body) {
+            data_access.addSingleAppointment(req, res, callbackBoolean);
+        } else {
+            res.send(false);
+        }
+    } else {
+        res.status(403);
+        res.redirect('/login');
+    }
 
-app.post('/getExampleUser', function (req, res) {
-
-    appointment1 = new Appointment({
-        start: new Date(2019, 03, 23, 10, 0, 0, 0),
-        end: new Date(2019, 03, 23, 11, 30, 0, 0),
-        title: 'Hair Appointment @Hairworx',
-        allDay: false
-    });
-
-    appointment2 = new Appointment({
-        start: new Date(2019, 03, 27, 16, 0, 0, 0),
-        end: new Date(2019, 03, 27, 16, 30, 0, 0),
-        title: 'Pay Fees',
-        allDay: false
-    });
-
-    res.send(new User({
-        email: 'admin@horanize.com',
-        firstName: 'Admin',
-        lastName: 'Admin',
-        adress: '1 Admin Drive',
-        school: 'UOIT',
-        pswHashed: '',
-        room: '',
-        admin: true,
-        resetTok: '',
-        resetTokExp: '',
-        appointments: [
-            appointment1, appointment2
-        ]
-
-    }));
 });
 
-//end of developer section
+app.post('/getAppointments', function (req, res) {
+    if (checkRequest(req)) {
+        if (req.body) {
+            data_access.getAppointments(req, res, getAppointmentsDone);
+        } else {
+            res.sendStatus(404);
+        }
+    } else {
+        res.status(403);
+        res.redirect('/login');
+    }
+});
+
+function getAppointmentsDone(req, res, appointments) {
+    if (appointments) {
+        res.send(appointments);
+    }else{
+        res.sendStatus(404);
+    }
+}
 
 app.get('/resetPassword/:token', function (req, res) {
     if (req.params.token) {
@@ -706,7 +703,6 @@ function initDB() {
         start: Date,
         end: Date,
         title: String,
-        allDay: Boolean
     });
     Appointment = mongoose.model('Appointment', appointmentSchema);
 

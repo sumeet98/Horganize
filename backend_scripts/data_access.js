@@ -455,6 +455,39 @@ exports.getDebts = function (req, res, callback) {
     });
 }
 
+exports.addSingleAppointment = function (req, res, callback) {
+    newAppointment = JSON.parse(req.body.data);
+    appointment = new Appointment({
+        start: new Date(newAppointment.start),
+        end: new Date(newAppointment.end),
+        title: newAppointment.title,
+    });
+    
+    User.findOne({ email: req.session.username}).then(function (user) {
+        if (user) {
+            user.appointments.push(appointment);
+            user.save(function (savingError) {
+                callback(req, res, savingError);
+            });
+        } else {
+            callback(req, res, new Error('User not found.'));
+        }
+    });
+}
+
+exports.getAppointments = function (req, res, callback) {
+    User.findOne({ email: req.session.username}).then(function (user) {
+        if (user) {
+                container = {
+                    appointments: user.appointments
+                }
+                callback(req, res, container);
+        } else {
+            callback(req, res, null);
+        }
+    });
+}
+
 exports.debtDone = function (req, res, callback) {
     User.findOne({ email: req.body.from }).then(function (user) {
         if (user) {
@@ -471,5 +504,7 @@ exports.debtDone = function (req, res, callback) {
         }
     });
 }
+
+
 
 

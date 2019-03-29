@@ -20,23 +20,27 @@ $(document).ready(function() {
                      } ,
                      true
                  );
+                 var obj = {title: title, start: start,end: end};
+
+                  $.post("/addAppointment",{
+                    data: JSON.stringify(obj)
+                  },
+                    function (data) {
+                      if (data === true) {
+                        console.log('Appointment saved');
+                      } else {
+                        console.log('Appointment could not be saved');
+                      }
+                    }
+                  );
              };
              $calendar.fullCalendar("unselect");
 
-             var obj = {title, start, end};
-             //TO DO add the url
-             $.ajax({
-              //  url: url,
-                type: 'POST',
-                contentType:'application/json',
-                data: JSON.stringify(obj),
-                dataType:'json'
-              });
 
 
   },
   events: function(start, end, timezone, callback) {
-          var url = 'http://localhost:3000/getExampleUser';
+          var url = '/getAppointments';
           $.ajax({
               type : 'POST',
               url: url,
