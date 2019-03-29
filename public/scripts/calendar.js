@@ -1,3 +1,4 @@
+
 $(document).ready(function() {
   var $calendar = $('#calendar').fullCalendar({
       header: {
@@ -8,44 +9,51 @@ $(document).ready(function() {
       selectable: true,
       editable: true,
       select: function(start, end, jsEvent, view) {
-           var title = prompt("Enter a title for this event", "New event");
+             var title = prompt("Enter a title for this event", "New event");
 
-           if (title) {
-             var event = {
-               title: title,
-               start: start,
-               end: end,
+             if (title) {
+                 $calendar.fullCalendar('renderEvent',
+                     {
+                         title: title,
+                         start: start,
+                         end: end,
+                     } ,
+                     true
+                 );
              };
+             $calendar.fullCalendar("unselect");
 
-             $calendar.fullCalendar("renderEvent", event, false);
-           };
-           $calendar.fullCalendar("unselect");
-        },
-    events: function(start, end, timezone, callback) {
-        var url = 'http://localhost:3000/getExampleUser';
-        $.ajax({
-            type : 'GET',
-            url: url,
-            dataType: 'json',
-            data: {
-              start: start.format(),
-              end: end.format()
-            },
-            success: function (doc) {
-                var events = [];
-                if(!!doc.result){
-                  $.map(doc.result, function(r){
-                    events.push({
-                      title: r.name,
-                      start: r.start,
-                      end: r.end
-                    });
-                  });
+             var obj = {title, start, end};
+             //TO DO add the url
+             $.ajax({
+              //  url: url,
+                type: 'POST',
+                contentType:'application/json',
+                data: JSON.stringify(obj),
+                dataType:'json'
+              });
+
+
+  },
+  events: function(start, end, timezone, callback) {
+          var url = 'http://localhost:3000/getExampleUser';
+          $.ajax({
+              type : 'POST',
+              url: url,
+              dataType: 'json',
+              success: function (doc) {
+                  var events = [];
+                  for(var i = 0; i < doc.appointments.length; ++i){
+                      events.push({
+                        title: doc.appointments[i].title,
+                        start: doc.appointments[i].start,
+                        end: doc.appointments[i].end
+                          });
+                      }
+                    callback(events);
+
                 }
-                callback(events);
-              }
-
-});
-}
+  });
+  }
 });
 });
