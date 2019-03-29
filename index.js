@@ -725,6 +725,13 @@ function initDB() {
         email: {
             type: String,
             validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please enter a valid email adress.'],
+            validate: function (data) {
+                if (data) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
             index: true,
             unique: true,
             require: true
