@@ -5,6 +5,18 @@ body{
     min-width:912px;  
 }
 
+@media only screen and (max-width: 768px) {
+    body{
+        min-width: 0;
+    }
+
+    span, input{
+        display: block;
+    }
+}
+
+
+
 #titleSection h1{
     color: white;
     position: absolute;
@@ -23,6 +35,19 @@ body{
     grid-template-columns: auto 200px 200px 100px;
     grid-gap: 10px;
     margin: 8px;
+}
+
+@media only screen and (max-width: 768px) {
+    #loginContainer{
+        display: grid;
+        grid-template-columns: auto;
+        grid-gap: 0;
+        padding: 8px;
+    }
+
+    #loginContainer > div:first-child {
+        display:none; 
+    }
 }
 
 #loginContainer .genButton{
@@ -58,6 +83,12 @@ input{
     margin-right: 1em;
     margin-left: 1em;
   }
+
+  @media only screen and (max-width: 768px) {
+    .genButton{
+        display: block;
+    }
+}
 
 .genButton:hover{
     background-color: #eaeaea;

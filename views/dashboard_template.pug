@@ -1,23 +1,23 @@
 doctype
 html
 
-head
-    meta(charset="utf-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    title Horganize!
-    meta(name="viewport", content="width=device-width, initial-scale=1")
-    link(href="https://fonts.googleapis.com/css?family=Raleway", rel="stylesheet")
-    link(href="https://cssicon.space/css/icons.css", rel="stylesheet")
-    link(rel="stylesheet", type="text/css", media="screen", href="/styles/main.css")
-    link(rel="stylesheet", type="text/css", media="screen", href="/styles/dashboard.css")
-    link(rel="shortcut icon", href="/images/favicon.ico")
-    block scripts
-        script(src="https://code.jquery.com/jquery-3.3.1.min.js", integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=", crossorigin="anonymous")
+    head
+        meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        title Horganize!
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        link(href="https://fonts.googleapis.com/css?family=Raleway", rel="stylesheet")
+        link(href="https://cssicon.space/css/icons.css", rel="stylesheet")
+        link(rel="stylesheet", type="text/css", media="screen", href="/styles/main.css")
+        link(rel="stylesheet", type="text/css", media="screen", href="/styles/dashboard.css")
+        link(rel="shortcut icon", href="/images/favicon.ico")
+        block scripts
+            script(src="https://code.jquery.com/jquery-3.3.1.min.js", integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=", crossorigin="anonymous")
 
-body
-    div(class="dashboardContainer")
-        div(id="content")
-            block navigation
-            div(id="logout")
-                a(href="/logout", class="link") Logout
+    body
+        div(class="dashboardContainer")
+            div(id="content")
+                block navigation
+                div(id="logout")
+                    a(href="/logout", class="link") Logout
 

@@ -4,3 +4,11 @@
     grid-template-columns: 50% 50%;
     grid-gap: 10px;
 }
+
+@media only screen and (max-width: 768px) {
+    .content{
+        display: grid;
+        grid-template-columns: auto;
+        grid-gap: 0;
+    }
+}
