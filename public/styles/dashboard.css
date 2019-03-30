@@ -194,3 +194,10 @@ ul{
     max-height: 150px;
     overflow-y: scroll;
 }
+
+#roommates{
+    max-height: 209px;
+    overflow: hidden;
+}
+
+

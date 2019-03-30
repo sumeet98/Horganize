@@ -44,7 +44,6 @@ exports.deleteShopping = function (req, res, callback) {
     User.find({ email: req.session.username }).then(function (user) {
         if (user.length > 0) {
             Room.findOneAndUpdate({ name: user[0].room }, { $set: { "items": [] } }, function (error, room) {
-                console.log(error);
                 callback(res, res, error);
             });
         }
@@ -75,7 +74,6 @@ exports.getShoppingList = function (req, res, callback) {
         if (user.length > 0) {
             Room.findOne({ name: user[0].room }).then(function (room) {
                 if (room) {
-                    console.log(room);
                     callback(req, res, room);
                 } else {
                     callback(req, res, null);
@@ -90,8 +88,6 @@ exports.addShoppingChecked = function (req, res, callback) {
         if (user.length > 0) {
             Room.findOne({ name: user[0].room }).then(function (room) {
                 if (room) {
-                    console.log(room);
-                    console.log(room.items[req.body.index]);
                     room.items[req.body.index].done = req.body.checked;
                     room.save(function (error) {
                         callback(res, res, error);
@@ -305,7 +301,6 @@ exports.changeLike = function (req, res, callback) {
                     room[0].save(function (error) {
                         callback(req, res, error);
                     });
-                    console.log(room[0].messages[i]);
                 }
             }
         } else {
@@ -328,7 +323,6 @@ exports.getMessages = function (req, res, callback) {
                     }
                 }
             }
-            console.log(JSON.stringify(room[0].messages));
             callback(req, res, room[0].messages);
         } else {
             callback(req, res, null);

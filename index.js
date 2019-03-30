@@ -37,7 +37,11 @@ app.use(express.static('public'));
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/public/login.html'));
-})
+});
+
+app.get('/login', function (req, res) {
+    res.sendFile(path.join(__dirname + '/public/login.html'));
+});
 
 app.post('/login', function (request, response) {
     data_access.getUser(request, response, performLogin);
@@ -79,25 +83,6 @@ app.get('/getProfile', function (req, res) {
     }
 });
 
-function getProfileDone(req, res, user) {
-    if (user.length > 0) {
-        cleanedUser = {
-            admin: user[0].admin,
-            adress: user[0].adress,
-            email: user[0].email,
-            firstName: user[0].firstName,
-            lastName: user[0].lastName,
-            room: user[0].room,
-            school: user[0].school
-        }
-        res.send(cleanedUser);
-    } else {
-        req.session.destroy(function (error) {
-            res.status(403);
-            res.redirect('/login.html');
-        });
-    }
-}
 
 app.post('/checkRoomExists/:roomName', function (req, res) {
     if (req.session.username && req.session.verified) {
@@ -109,7 +94,6 @@ app.post('/checkRoomExists/:roomName', function (req, res) {
 });
 
 app.post('/registerRoom/:roomName', function (req, res) {
-    console.log('register Room');
     if (req.session.username && req.session.verified) {
         data_access.addRoom(req, res, registerRoomDone)
 
@@ -119,24 +103,6 @@ app.post('/registerRoom/:roomName', function (req, res) {
     }
 });
 
-function registerRoomDone(req, res, error) {
-    if (error) {
-        //error name: 'MongoError' code: 11000 --> Duplicate Keys
-        //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
-
-        if (error.name == 'MongoError' && error.code == 11000) {
-
-        } else {
-
-        }
-        res.status(500);
-        res.send('false');
-
-    } else {
-        res.status(200);
-        res.send('true');
-    }
-}
 
 app.post('/joinRoom', function (req, res) {
     if (req.session.username && req.session.verified) {
@@ -146,13 +112,7 @@ app.post('/joinRoom', function (req, res) {
     }
 });
 
-function joinRoomDone(req, res, error) {
-    if (error) {
-        res.send('false');
-    } else {
-        res.send('true');
-    }
-}
+
 
 app.get('/logout', function (req, res) {
     if (checkRequest(req)) {
@@ -200,7 +160,7 @@ app.get('/tasks', function (req, res) {
 
 app.get('/calendar', function (req, res) {
     if (checkRequest(req)) {
-        res.sendFile(path.join(__dirname + '/private/calendar.html')); //for development purposes
+        res.sendFile(path.join(__dirname + '/private/calendar.html'));
     } else {
         res.status(403);
         res.redirect('/login.html');
@@ -240,19 +200,7 @@ app.post('/roommates', function (req, res) {
     }
 });
 
-function getRoomMatesDone(req, res, users) {
-    mates = [];
-    for (let i = 0; i < users.length; i++) {
-        mates[i] = {
 
-            "firstName": users[i].firstName,
-            "lastName": users[i].lastName,
-            "email": users[i].email,
-            "school": users[i].school
-        };
-    }
-    res.send(mates);
-}
 app.get('/getShoppingList', function (req, res) {
     if (checkRequest(req)) {
         data_access.getShoppingList(req, res, getShoppingListDone);
@@ -276,11 +224,6 @@ app.get('/admin', function (req, res) {
         res.redirect('/login.html');
     }
 });
-
-
-function getShoppingListDone(req, res, list) {
-    res.send(list);
-}
 
 app.get('/deleteAllShoppingItems', function (req, res) {
     if (checkRequest(req)) {
@@ -309,15 +252,6 @@ app.post('/putShoppingListChecked', function (req, res) {
     }
 });
 
-
-function callbackBoolean(req, res, error) {
-    if (error) {
-        res.send(false);
-    } else {
-        res.status(200);
-        res.send(true);
-    }
-}
 
 app.get('/wipeAll', function (req, res) {
     if (checkRequest(req) && req.session.admin) {
@@ -391,10 +325,6 @@ app.get('/getMessages', function (req, res) {
 });
 
 
-function getMessagesDone(req, res, messages) {
-    res.send(messages);
-}
-
 app.post('/likeMessage', function (req, res) {
     if (checkRequest(req)) {
         data_access.changeLike(req, res, callbackBoolean);
@@ -419,36 +349,6 @@ app.post('/resetPassword', function (req, res) {
         });
     }
 });
-
-function resetPasswordSent(req, res, error, token) {
-    if (error) {
-        res.render('landing_message', {
-            message: 'If this account was found, the email was sent out.'
-        });
-    } else {
-        transporter.sendMail({
-            to: req.body.email,
-            subject: 'Horganize Password Reset',
-            text: 'Hi there!\n\n' +
-                'please click on the following link to reset your password: \n' +
-                'http://localhost:3000/resetPassword/' + token + ' \n' +
-                'This link will automatically log you in and redirect you to the profile page, where you can set your new password. ' +
-                'If your profile is not assigned to a room, you have to complete the setup first. \n\n' +
-                'Thanks for using HORGANIZE!'
-        }, function (error, info) {
-            if (error) {
-                res.render('landing_message', {
-                    message: 'Could not send password reset email.'
-                });
-            } else {
-                res.render('landing_message', {
-                    message: 'If this account was found, the email was sent out.'
-                });
-            }
-        });
-
-    }
-}
 
 app.post('/addAppointment', function (req, res) {
     if (checkRequest(req)) {
@@ -477,14 +377,6 @@ app.post('/getAppointments', function (req, res) {
     }
 });
 
-function getAppointmentsDone(req, res, appointments) {
-    if (appointments) {
-        res.send(appointments);
-    }else{
-        res.sendStatus(404);
-    }
-}
-
 app.get('/resetPassword/:token', function (req, res) {
     if (req.params.token) {
         data_access.checkToken(req, res, resetPasswordComplete);
@@ -494,29 +386,6 @@ app.get('/resetPassword/:token', function (req, res) {
     }
 });
 
-function resetPasswordComplete(req, res, error, user) {
-    if (error) {
-        res.render('landing_message', {
-            message: 'This link is not valid.'
-        });
-    } else {
-        if (user.room == '') {
-            req.session.username = user.email;
-            req.session.admin = user.admin;
-            req.session.verified = user.verified;
-            log(req.session.username + ' successfully logged in.');
-            res.redirect('/setup');
-        } else {
-            req.session.username = user.email;
-            req.session.room = user.room;
-            req.session.admin = user.admin;
-            req.session.verified = user.verified;
-            log(req.session.username + ' successfully logged in.');
-            res.redirect('/profile');
-        }
-    }
-}
-
 app.get('/activateAccount/:token', function (req, res) {
     if (req.params.token) {
         data_access.checkRegisterToken(req, res, activateAccountComplete);
@@ -525,29 +394,6 @@ app.get('/activateAccount/:token', function (req, res) {
         res.redirect('/login.html');
     }
 });
-
-function activateAccountComplete(req, res, error, user) {
-    if (error) {
-        res.render('landing_message', {
-            message: 'This link is not valid.'
-        });
-    } else {
-        if (user.room == '') {
-            req.session.username = user.email;
-            req.session.admin = user.admin;
-            req.session.verified = user.verified;
-            log(req.session.username + ' successfully logged in.');
-            res.redirect('/setup');
-        } else {
-            req.session.username = user.email;
-            req.session.room = user.room;
-            req.session.admin = user.admin;
-            req.session.verified = user.verified;
-            log(req.session.username + ' successfully logged in.');
-            res.redirect('/profile');
-        }
-    }
-}
 
 app.post('/addDebt', function (req, res) {
     if (checkRequest(req)) {
@@ -570,13 +416,6 @@ app.post('/getDebts', function (req, res) {
 app.get('/about', function (req, res) {
     res.render('landing_about', {});
 });
-
-function getDebtsDone(req, res, exp, debts) {
-    //put both parameters in one array to send back to client
-    response = [];
-    response.push(exp, debts);
-    res.send(response);
-}
 
 app.post('/debtDone', function (req, res) {
     if (checkRequest(req)) {
@@ -653,7 +492,7 @@ function registerDone(req, res, error) {
 }
 
 function performLogin(req, res, user) {
-    setTimeout(function() {
+    setTimeout(function () {
         //delay the login for 1 sec to reduce vulnerability to brute force attacks
         if (user) {
             if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
@@ -689,7 +528,7 @@ function performLogin(req, res, user) {
                 message: 'Username or password incorrect. Please try again. '
             })
         }
-      }, 1000);
+    }, 1000);
 }
 
 
@@ -709,15 +548,15 @@ function initDB() {
     Appointment = mongoose.model('Appointment', appointmentSchema);
 
     expenditureSchema = new mongoose.Schema({
-        id: {type: Number, required: true}, //for security: create unique id on user basis for the client to hide mongoose id 
-        name: {type: String, required: true, trim: true},
+        id: { type: Number, required: true }, //for security: create unique id on user basis for the client to hide mongoose id 
+        name: { type: String, required: true, trim: true },
         amountCents: Number,
     });
     Expenditure = mongoose.model('Expenditure', expenditureSchema);
 
     debtSchema = new mongoose.Schema({
-        to: {type: String, required: true, ref: 'User'},
-        from: {type: String, required: true, ref: 'User'},
+        to: { type: String, required: true, ref: 'User' },
+        from: { type: String, required: true, ref: 'User' },
         fromFirst: String,
         amountCents: Number,
     });
@@ -744,15 +583,19 @@ function initDB() {
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
         pswHashed: { type: String, required: true },
         room: { type: String, ref: 'Room' },
-        admin: {type: Boolean, required: true, default: false},
+        admin: { type: Boolean, required: true, default: false },
         resetTok: String,
-        resetTokExp: {type: Date, validate: {validator: function (val) {
-            if (val=='' || !val) {
-                return true;
-            } else {
-                return val >  Date.now()
+        resetTokExp: {
+            type: Date, validate: {
+                validator: function (val) {
+                    if (val == '' || !val) {
+                        return true;
+                    } else {
+                        return val > Date.now()
+                    }
+                }
             }
-        }}},
+        },
         registerToken: String,
         verified: Boolean,
         appointments: [appointmentSchema],
@@ -878,3 +721,175 @@ function checkRequest(req) { //seperate Function for all required checks to make
     }
 }
 
+
+function getProfileDone(req, res, user) {
+    if (user.length > 0) {
+        cleanedUser = {
+            admin: user[0].admin,
+            adress: user[0].adress,
+            email: user[0].email,
+            firstName: user[0].firstName,
+            lastName: user[0].lastName,
+            room: user[0].room,
+            school: user[0].school
+        }
+        res.send(cleanedUser);
+    } else {
+        req.session.destroy(function (error) {
+            res.status(403);
+            res.redirect('/login.html');
+        });
+    }
+}
+
+
+function registerRoomDone(req, res, error) {
+    if (error) {
+        //error name: 'MongoError' code: 11000 --> Duplicate Keys
+        //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
+
+        if (error.name == 'MongoError' && error.code == 11000) {
+
+        } else {
+
+        }
+        res.status(500);
+        res.send('false');
+
+    } else {
+        res.status(200);
+        res.send('true');
+    }
+}
+
+function getShoppingListDone(req, res, list) {
+    res.send(list);
+}
+
+function joinRoomDone(req, res, error) {
+    if (error) {
+        res.send('false');
+    } else {
+        res.send('true');
+    }
+}
+
+function getRoomMatesDone(req, res, users) {
+    mates = [];
+    for (let i = 0; i < users.length; i++) {
+        mates[i] = {
+
+            "firstName": users[i].firstName,
+            "lastName": users[i].lastName,
+            "email": users[i].email,
+            "school": users[i].school
+        };
+    }
+    res.send(mates);
+}
+
+function getMessagesDone(req, res, messages) {
+    res.send(messages);
+}
+
+function resetPasswordSent(req, res, error, token) {
+    if (error) {
+        res.render('landing_message', {
+            message: 'If this account was found, the email was sent out.'
+        });
+    } else {
+        transporter.sendMail({
+            to: req.body.email,
+            subject: 'Horganize Password Reset',
+            text: 'Hi there!\n\n' +
+                'please click on the following link to reset your password: \n' +
+                'http://localhost:3000/resetPassword/' + token + ' \n' +
+                'This link will automatically log you in and redirect you to the profile page, where you can set your new password. ' +
+                'If your profile is not assigned to a room, you have to complete the setup first. \n\n' +
+                'Thanks for using HORGANIZE!'
+        }, function (error, info) {
+            if (error) {
+                res.render('landing_message', {
+                    message: 'Could not send password reset email.'
+                });
+            } else {
+                res.render('landing_message', {
+                    message: 'If this account was found, the email was sent out.'
+                });
+            }
+        });
+
+    }
+}
+
+function getAppointmentsDone(req, res, appointments) {
+    if (appointments) {
+        res.send(appointments);
+    } else {
+        res.sendStatus(404);
+    }
+}
+
+
+function resetPasswordComplete(req, res, error, user) {
+    if (error) {
+        res.render('landing_message', {
+            message: 'This link is not valid.'
+        });
+    } else {
+        if (user.room == '') {
+            req.session.username = user.email;
+            req.session.admin = user.admin;
+            req.session.verified = user.verified;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/setup');
+        } else {
+            req.session.username = user.email;
+            req.session.room = user.room;
+            req.session.admin = user.admin;
+            req.session.verified = user.verified;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/profile');
+        }
+    }
+}
+
+function activateAccountComplete(req, res, error, user) {
+    if (error) {
+        res.render('landing_message', {
+            message: 'This link is not valid.'
+        });
+    } else {
+        if (user.room == '') {
+            req.session.username = user.email;
+            req.session.admin = user.admin;
+            req.session.verified = user.verified;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/setup');
+        } else {
+            req.session.username = user.email;
+            req.session.room = user.room;
+            req.session.admin = user.admin;
+            req.session.verified = user.verified;
+            log(req.session.username + ' successfully logged in.');
+            res.redirect('/profile');
+        }
+    }
+}
+
+function getDebtsDone(req, res, exp, debts) {
+    //put both parameters in one array to send back to client
+    response = [];
+    response.push(exp, debts);
+    res.send(response);
+}
+
+
+function callbackBoolean(req, res, error) {
+    if (error) {
+        res.send(false);
+    } else {
+        res.status(200);
+        res.send(true);
+    }
+}

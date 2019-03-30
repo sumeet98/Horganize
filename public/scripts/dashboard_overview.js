@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $.post("/roommates", function (data) {
         for (let i = 0; i < data.length; i++) {
             $('#roomMates').append('<li>' + data[i].firstName + ' ' +
@@ -7,40 +6,10 @@ $(document).ready(function () {
                 data[i].school + ' (' +
                 data[i].email + ')' + '</li>');
         }
-
     }
     );
 
-    $.get("/getMessages",
-        function (messages) {
-            $('#messages').empty();
-            messages.forEach(element => {
-                date = new Date(element.datetime);
-                if (element.liked.length > 0) {
-                    if (!date.getMonth() < (new Date(Date.now()).getMonth() - 1)) {
-                        $('#messages').append('<div class="message filled" id="' + element.datetime + ',' + element.email + '">' +
-                            (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' (' +
-                            element.user + '): ' +
-                            element.message + '<div class="anIcon">' + '<div class="heart-solid icon"><i></i></div>' + '</div>' +
-                            '</div>' + '<br>'
-                        );
-                    }
-                } else {
-                    if (!date.getMonth() < (new Date(Date.now()).getMonth() - 1)) {
-                        $('#messages').append('<div class="message" id="' + element.datetime + ',' + element.email + '">' +
-                            (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' (' +
-                            element.user + '): ' +
-                            element.message + '<div class="anIcon">' + '<div class="minus icon"><i></i></div>' + '</div>' +
-                            '</div>' + '<br>'
-                        );
-                    }
-                }
-            });
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
-            $('#messageInput').val('');
-            addLike();
-        }
-    );
+    getMessages();
 
     $('#messageInput').keyup(function (e) {
         if (e.which == '13') {
@@ -89,6 +58,36 @@ $(document).ready(function () {
 });
 
 
+function getMessages() {
+    $.get("/getMessages", function (messages) {
+        $('#messages').empty();
+        messages.forEach(element => {
+            date = new Date(element.datetime);
+            if (element.liked.length > 0) {
+                if (!date.getMonth() < (new Date(Date.now()).getMonth() - 1)) {
+                    $('#messages').append('<div class="message filled" id="' + element.datetime + ',' + element.email + '">' +
+                        (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' (' +
+                        element.user + '): ' +
+                        element.message + '<div class="anIcon">' + '<div class="heart-solid icon"><i></i></div>' + '</div>' +
+                        '</div>' + '<br>');
+                }
+            }
+            else {
+                if (!date.getMonth() < (new Date(Date.now()).getMonth() - 1)) {
+                    $('#messages').append('<div class="message" id="' + element.datetime + ',' + element.email + '">' +
+                        (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear() + ' (' +
+                        element.user + '): ' +
+                        element.message + '<div class="anIcon">' + '<div class="minus icon"><i></i></div>' + '</div>' +
+                        '</div>' + '<br>');
+                }
+            }
+        });
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+        $('#messageInput').val('');
+        addLike();
+    });
+}
+
 function addLike() {
     $('.anIcon').click(function () {
 
@@ -103,16 +102,15 @@ function addLike() {
             $(this).parent().removeClass('filled');
             like = false;
         }
-
-        console.log($(this).parent().attr('id').split(',')[1]);
-        console.log($(this).parent().attr('id').split(',')[0]);
         $.post("/likeMessage", {
             username: $(this).parent().attr('id').split(',')[1],
             time: $(this).parent().attr('id').split(',')[0],
             like: like
         },
             function (data) {
-                console.log(data);
+                if (data != true) {
+                    getMessages();
+                } 
             }
         );
     });

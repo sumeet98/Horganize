@@ -9,12 +9,4 @@ $(document).ready(function () {
             }
         });
     });
-
-    $('#wipeRooms').click(function (e) { 
-        e.preventDefault();
-        $.get("/wipeRooms", function (data) {
-            
-        }
-        );
-    });
 });

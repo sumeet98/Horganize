@@ -5,7 +5,6 @@ var pswPattern4 = /.*([0-9]+).*/; //at least 1 number
 $(document).ready(function () {
     $.get("/getProfile",
         function (profile) {
-            console.log(profile);
             if (profile) {
                 $('#actual').html('<label class="entry">Admin</label>' +
                     '<input class="entry" value="' + profile.admin + '" readonly  disabled>' +

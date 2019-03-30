@@ -8,13 +8,13 @@ block content
         h3 Welcome #{username}
         hr
         h4 Room Announcements:
-        div(class="dual")
+        div(class="dual maxHeight")
             div(class="box spaceIn space")
                 div(id="messages" class="spaceIn")
                 div(id="inputContainer")
                     label Message: 
                     input(id="messageInput", maxlength="40")
-            div(class="box spaceIn space")
+            div(id="roommates", class="box spaceIn space")
                 p The following people are in your room #{room}:
                 ul(id="roomMates")
         hr
