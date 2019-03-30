@@ -747,13 +747,6 @@ function registerRoomDone(req, res, error) {
     if (error) {
         //error name: 'MongoError' code: 11000 --> Duplicate Keys
         //error name: 'ValidatorError' message: PERSONAL ERROR MESSAGE TO DISPLAY
-
-        if (error.name == 'MongoError' && error.code == 11000) {
-
-        } else {
-
-        }
-        res.status(500);
         res.send('false');
 
     } else {

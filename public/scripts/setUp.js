@@ -50,6 +50,7 @@ $(document).ready(function () {
                     window.location.replace('/dashboard');
                 }, 1000);
             } else {
+                $('#roomNameInfo').html('Could not create Room.');
             }
         });
 
