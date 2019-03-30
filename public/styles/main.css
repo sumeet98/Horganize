@@ -28,6 +28,29 @@ body{
 #titleSection img{
     width: 100%;
 }
+@media only screen and (max-width: 768px) {
+    #titleSection h1{
+        font-size: 2em;
+        color: black;
+        position: relative;
+        left: 0;
+        top: 0;
+    }
+
+    #titleSection img{
+        display: none;
+    }
+
+    #titleSection{
+        padding: 8px;
+    }
+
+    #titleSection a{
+        text-decoration: none;
+    }
+    
+}
+
 
 
 #loginContainer{

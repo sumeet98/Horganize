@@ -8,17 +8,21 @@
     padding: 20px;
 }
 
+#registerContainer div{
+    display: table-row;
+    
+}
 @media only screen and (max-width: 768px) {
     #registerContainer{
         margin: 0;
         padding: 8px;
     }
+    #registerContainer div{
+        display: block;
+        
+    }
 }
 
-#registerContainer div{
-    display: table-row;
-    
-}
 
 #registerContainer label{
     display: table-cell;
