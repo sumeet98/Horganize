@@ -24,7 +24,7 @@ $(document).ready(function () {
             e.preventDefault();
             array = $('#who').val().split(';');
 
-            if ($('#what').val() != '' && array.length>0  && /^\d*\.\d{0,2}$/.test($('#price').val())) {
+            if ($('#what').val() != '' && array.length>0  && /^\d*\.{0,1}\d{0,2}$/.test($('#price').val())) {
                 $.post("/addDebt", {
                     what: $('#what').val(), //cast before
                     who: array,

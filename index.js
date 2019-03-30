@@ -423,7 +423,7 @@ app.post('/resetPassword', function (req, res) {
 function resetPasswordSent(req, res, error, token) {
     if (error) {
         res.render('landing_message', {
-            message: 'Error while sending password reset email.'
+            message: 'If this account was found, the email was sent out.'
         });
     } else {
         transporter.sendMail({
@@ -442,7 +442,7 @@ function resetPasswordSent(req, res, error, token) {
                 });
             } else {
                 res.render('landing_message', {
-                    message: 'Password reset email sent! Have a look at your inbox.'
+                    message: 'If this account was found, the email was sent out.'
                 });
             }
         });
@@ -653,41 +653,43 @@ function registerDone(req, res, error) {
 }
 
 function performLogin(req, res, user) {
-    if (user) {
-        if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
-            console.log(user);
-            if (user.room == '' && user.verified) {
-                req.session.username = req.body.emailLogin;
-                req.session.admin = user.admin;
-                req.session.verified = user.verified;
-                log(req.session.username + ' successfully logged in.');
-                res.redirect('/setup');
-            } else if (user.verified) {
-                req.session.username = req.body.emailLogin;
-                req.session.room = user.room;
-                req.session.admin = user.admin;
-                req.session.verified = user.verified;
-                log(req.session.username + ' successfully logged in.');
-                res.redirect('/dashboard');
+    setTimeout(function() {
+        //delay the login for 1 sec to reduce vulnerability to brute force attacks
+        if (user) {
+            if (bcrypt.compareSync(req.body.pswLogin, user.pswHashed)) {
+                if (user.room == '' && user.verified) {
+                    req.session.username = req.body.emailLogin;
+                    req.session.admin = user.admin;
+                    req.session.verified = user.verified;
+                    log(req.session.username + ' successfully logged in.');
+                    res.redirect('/setup');
+                } else if (user.verified) {
+                    req.session.username = req.body.emailLogin;
+                    req.session.room = user.room;
+                    req.session.admin = user.admin;
+                    req.session.verified = user.verified;
+                    log(req.session.username + ' successfully logged in.');
+                    res.redirect('/dashboard');
+                } else {
+                    res.status(403);
+                    res.render('landing_message', {
+                        message: 'Please verify your email. '
+                    })
+                }
             } else {
+                log(req.session.username + ' attempted login.');
                 res.status(403);
                 res.render('landing_message', {
-                    message: 'Please verify your email. '
+                    message: 'Username or password incorrect. Please try again. '
                 })
             }
         } else {
             log(req.session.username + ' attempted login.');
-            res.status(403);
             res.render('landing_message', {
                 message: 'Username or password incorrect. Please try again. '
             })
         }
-    } else {
-        log(req.session.username + ' attempted login.');
-        res.render('landing_message', {
-            message: 'Username or password incorrect. Please try again. '
-        })
-    }
+      }, 1000);
 }
 
 
