@@ -1,9 +1,5 @@
 exports.register = function (req, res, hashedPassword, callback) {
-    if (req.body.emailRegister == 'timo.buechert@uoit.net') {
-        admin = true;
-    } else {
-        admin = false;
-    }
+
     new User({
         email: req.body.emailRegister,
         firstName: req.body.nameFirstRegister,
@@ -12,7 +8,7 @@ exports.register = function (req, res, hashedPassword, callback) {
         school: req.body.schoolRegister,
         pswHashed: hashedPassword,
         room: '',
-        admin: admin,
+        admin: false,
         resetTok: '',
         resetTokExp: '',
         registerToken: req.body.registerToken,
@@ -135,7 +131,9 @@ exports.wipeAll = function (req, res, callback) {
             if (errorUser || errorRoom) {
                 callback(req, res, new Error('Wipe Error'));
             } else {
-                callback(req, res, null);
+                req.session.destroy(function (error) {
+                    callback(req, res, error);
+                });
             }
 
         });

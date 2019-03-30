@@ -566,18 +566,14 @@ function initDB() {
         email: {
             type: String,
             validate: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please enter a valid email adress.'],
-            validate: function (data) {
-                if (data) {
-                    return true;
-                } else {
-                    return false;
-                }
-            },
             index: true,
             unique: true,
             require: true
         },
-        firstName: { type: String, required: true },
+        firstName: {
+            type: String,
+            required: true
+        },
         lastName: { type: String, required: true },
         adress: String,
         school: { type: String, enum: { values: ['UOIT', 'Durham College', 'Trent University'], message: 'Please enter a valid registered school.' } },
