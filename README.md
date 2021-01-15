@@ -1,10 +1,10 @@
-# About / Horganize
+# About / TeamLab
 
 
 Since living is a very large part of studying on campus, we got the idea to simplify the organization with a web application.
 When we say we, we mean two young students from UOIT in OSHAWA.
 Since we live on campus ourselves, we used this app to address all the difficulties with living we experienced ourselves. 
-HORGANIZE was developed as part of the course Web Application Development (CSCI3230U) at UOIT (University of Ontario Institute of Technology) in Winter 2019.
+TeamLab was developed as part of the course Web Application Development (CSCI3230U) at UOIT (University of Ontario Institute of Technology) in Winter 2019.
 
 
 ## Authors
